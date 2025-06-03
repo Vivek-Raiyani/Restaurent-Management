@@ -1,0 +1,226 @@
+@using Microsoft.AspNetCore.Hosting.Server
+@model pizzashop.data.ViewModels.Orders.OderDetailsVM
+@{
+   ViewData["Title"] = "ExportPdf"; Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<style>
+   .container {
+      padding: 10px 0px;
+   }
+
+   .border-color-blue {
+      background-color: #0066a6;
+   }
+
+   .color-blue {
+      color: #0066a6;
+   }
+
+   .pizzaHeading {
+      color: #0066a6;
+      font-size: 25px;
+   }
+
+   .text-white {
+      color: white;
+   }
+
+   .border-bottom {
+      border-bottom: 1px solid #0066a6;
+   }
+</style>
+
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>ExportPdf - Pizzashop</title>
+   <link rel="stylesheet"
+      href="@($"{Context.Request.Scheme}://{Context.Request.Host}/lib/bootstrap/dist/css/bootstrap.min.css")" />
+   <link rel="stylesheet" href="~/css/site.css" />
+</head>
+
+<body>
+   <script src="~/lib/jquery/dist/jquery.min.js"></script>
+   <div class="container w-75">
+      <div style="text-align: center; white-space: nowrap; margin-top: 20px;">
+         <div style="display: inline-block; vertical-align: middle;">
+            <img src="@Url.Content("~/images/pizzashop_logo.png")" alt="PizzaShop"
+               style="width: 50%; vertical-align: middle;">
+         </div>
+         <div style="display: inline-block">
+            <p class="pizzaHeading"
+               style="display: inline-block; margin-left:-50px; font-size: 24px; font-weight: bold;">
+               PIZZASHOP</p>
+         </div>
+      </div>
+      <div class="m-0 mt-3 customer-details-table-row" style="white-space: nowrap;">
+         <div class="p-3 justify-self-center"
+            style="display: inline-block; vertical-align: top; width: 48%; box-sizing: border-box;">
+            <p class="fw-bold color-blue">Customer Details</p>
+            <div>
+               <span>Name: </span>
+               <span>@Model.Customer.Name</span>
+               <br />
+               <span>Phone: </span>
+               <span>@Model.Customer.Phone</span><br />
+            </div>
+         </div>
+
+         <div class="p-3" style="display: inline-block; vertical-align: top; width: 48%; box-sizing: border-box;">
+            <p class="fw-bold color-blue">Order Details</p>
+            <div>
+               <span>Invoice Number: </span>
+               <span>#@Model.InvoiceId</span>
+               <br />
+               <span>Date: </span>
+               <span> @Model.PaidOn.ToShortDateString()</span>
+               <br />
+               <span>Section: </span>
+               <span>@Model.Tables.Section</span>
+               <br />
+               <span>Table: </span>
+               @for (var i = 0; i < Model.Tables.TableNames.Count(); i++)
+               {
+                  if (Model.Tables.TableNames.Count - i == 1)
+                  {
+                     <span>@Model.Tables.TableNames[i]</span>
+                  }
+                  else
+                  {
+                     <span>@Model.Tables.TableNames[i],</span>
+                  }
+               }
+               <br />
+            </div>
+         </div>
+      </div>
+      <div class="table-responsive mt-2">
+         <table class="table fw-lighter order-details-table" id="orderDetailsTable">
+            <thead>
+               <tr class="border-bottom border-color-blue">
+                  <th scope="col" class="background-white text-white">Sr.No.</th>
+                  <th scope="col" class="background-color-blue text-white">Items</th>
+                  <th scope="col" class="background-color-blue text-white">Quantity</th>
+                  <th scope="col" class="text-end background-color-blue text-white">Unit Price</th>
+                  <th scope="col" class="text-end background-color-blue text-white">Amount</th>
+               </tr>
+            </thead>
+            <tbody id="orderTableBody">
+               @{
+                  float subtotal = 0;
+               }
+               @if (Model.Items != null && Model.Items.Any())
+               { 
+                  for (int i = 0; i < Model.Items.Count; i++)
+                  {
+                     var item = Model.Items[i];
+                     <tr>
+                        <td rowspan="@(Model.Items[i].Modifiers.Count()+1)">
+                           @(i + 1)
+                        </td>
+                        <td class="pb-0">@item.Name</td>
+                        <td class="pb-0">@item.Quantity</td>
+                        <td class="text-end pb-0">@item.Price.ToString("0.00")</td>
+                        <td class="text-end pb-0 itemprice">@((item.Price * item.Quantity).ToString("0.00"))</td>
+                        @{
+                           subtotal+=item.Price * item.Quantity;
+                        }
+                     </tr>
+                     if (item.Modifiers != null && item.Modifiers.Any())
+                     {
+                        for (int j = 0; j < item.Modifiers.Count(); j++)
+                        {
+                           var modifier = item.Modifiers.ElementAt(j); var count = item.Modifiers?.Count();
+                           <tr class="@(count != j + 1 ? "" : "border-bottom")">
+                              <td class="@(count != j + 1 ? "py-0" : "pt-0")" colspan="2">@modifier.Name</td>
+                              <td class="text-end @(count != j + 1 ? "py-0" : "pt-0")">
+                                 @modifier.Price.ToString("0.00")
+                              </td>
+                              <td class="text-end itemprice @(count != j + 1 ? "py-0" : "pt-0")">@((item.Quantity *
+                     modifier.Price).ToString("0.00"))
+                              </td>
+                              @{
+                                 subtotal+=(modifier.Price * item.Quantity);
+                              }
+                           </tr>
+                        }
+                     }
+                  }
+                  <tr>
+                     <td colspan="4"><strong>Sub Total:</strong></td>
+                     <td class="text-end" id="subtotal"><strong>@subtotal</strong></td>
+                     @* <td class="text-end"><strong>@Model.Amount.ToString("0.00")</strong></td> *@
+
+                  </tr>
+
+
+                  @if (Model.OrderTax != null && Model.OrderTax.Any())
+                  {
+                     @foreach (var tax in Model.OrderTax)
+                     {
+                        <tr>
+                           <td colspan="4">@tax.Tax.TaxName</td>
+                           <td class="text-end ordertax">@tax.Amount</td>
+                           @{
+                              subtotal+= tax.Amount;
+                           }
+                           @* <td class="text-end">@tax.TaxAmount.ToString("0.00")</td> *@
+                        </tr>
+                     }
+                  }
+                  @* <tr>
+               <td colspan="4"> Other:</td>
+               <td class="text-end"> 150 </td>
+               <td class="text-end"> @Model.Other.ToString("0.00") </td>
+               </tr> *@
+                  <tr class="border-top  text-white fw-bold">
+                     <td colspan="4" class="color-blue"> Total Amount Due:</td>
+                     <td class="text-end color-blue" id="ordertotal">@subtotal</td>
+                     @* <td class="text-end color-blue"> @Model.Amount.ToString("0.00") </td> *@
+                  </tr>
+               }
+               else
+               {
+                  <tr>
+                     <td colspan="5" class="text-center">No items found</td>
+                  </tr>
+               }
+
+            </tbody>
+         </table>
+      </div>
+      <div>
+         <span class="color-blue text-center"><strong>Payment Information:</strong></span>
+         <br /> <span>Payment Method:</span>
+         <span>@Model.PaymentMethod</span>
+      </div>
+      <div class="d-flex mt-5 text-center">
+         <span class="color-blue fw-bold ">THANK YOU!</span>
+      </div>
+   </div>
+
+   <script
+      src="@($"{Context.Request.Scheme}://{Context.Request.Host}/lib/bootstrap/dist/js/bootstrap.bundle.min.js")"></script>
+   <script src="~/js/site.js"></script>
+   <script>
+      $(document).ready(function () {
+         let subtotal = 0;
+         $(".itemprice").each(function () {
+            subtotal += parseFloat($(this).text());
+            console.log(subtotal);
+         });
+
+         $("#subtotal").text(subtotal.toFixed(2));
+
+         $(".ordertax").each(function () {
+            subtotal += parseFloat($(this).text());
+         });
+
+         $("#ordertotal").text(subtotal.toFixed(2));
+      });
+   </script>
+</body>
+
+</html>

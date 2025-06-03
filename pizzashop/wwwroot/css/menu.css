@@ -1,0 +1,60 @@
+
+
+a{
+    text-decoration: none;
+    color: black;
+}
+
+nav{
+    background-color: #0066ab;
+}
+.nav-link{
+    color: black;
+}
+
+
+.vertical-tab-btn{
+    width: 100%;
+}
+
+.icon-img{
+    width: 20px;
+}
+
+
+.search-icon{
+    margin-top: -35px; 
+    margin-right: 20px;
+}
+
+.btn-outline{
+    border: 1px solid #0066ab;
+    background-color: #0066ab;
+    color: white;
+}
+
+.nav-pills  .nav-link.active, .nav-pills .show>.nav-link{
+    border: 1px solid #0066ab;
+    background-color: #0066ab;
+    color: white;
+}
+
+
+
+.nav-item:active .menu-sidebar-btn{
+    display: block;
+}
+
+.nav-item .menu-sidebar-btn{
+    display: none;
+}
+
+.nav-item:hover .menu-sidebar-btn{
+    display: inline;
+}
+
+.nav-link.nav-link.active .menu-sidebar-btn{
+    display: inline;
+}
+
+    

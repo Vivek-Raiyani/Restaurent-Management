@@ -1,0 +1,188 @@
+@model pizzashop.data.ViewModels.PaginatedListVM<pizzashop.data.ViewModels.Orders.OrderListVM>
+<div class="tile">
+
+<div class="table-responsive p-4  ">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col d-flex" class="text-center align-content-center">
+                    #Order
+                    <!-- for small screen remove btn-->
+                    <i class="bi bi-arrow-down" data-name="order"></i>
+                    <i class="bi bi-arrow-up" data-name="order"></i>
+                </th>
+                <th scope="col" class="text-center align-content-center">
+                    Date
+                    <i class="bi bi-arrow-down" data-name="date"></i>
+                    <i class="bi bi-arrow-up" data-name="date"></i>
+                </th>
+                <th scope="col" class="text-center align-content-center">
+                    Customer
+                    <i class="bi bi-arrow-down" data-name="customer"></i>
+                    <i class="bi bi-arrow-up" data-name="customer"></i>
+                </th>
+                <th scope="col d-flex" class="text-center align-content-center">
+                    Status
+                </th>
+                <th scope="col" class="text-center align-content-center">Payment Mode</th>
+                <th scope="col d-flex" class="text-center align-content-center">
+                    Ratings
+                </th>
+                <th scope="col d-flex" class="text-center align-content-center">
+                    Total Amount
+                    <i class="bi bi-arrow-down" data-name="amount"></i>
+                    <i class="bi bi-arrow-up" data-name="amount"></i>
+                </th>
+                <th scope="col" class="text-center align-content-center">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in @Model.Items)
+            {
+                <tr>
+                    <td class=" text-center align-content-center">
+                        <div class="d-flex">
+                            @* <img src="@item.ProfileImg" class="rounded-circle" alt="pic" width="40px"> *@
+                            <p>@item.OrderID</p>
+                        </div>
+
+                    </td>
+                    <td class=" text-center align-content-center">
+                        <p>@item.OrderDate.ToShortDateString()</p>
+                    </td>
+
+                    <td class=" text-center align-content-center">
+                        <p>@item.Customer</p>
+                    </td>
+                    <td class=" text-center align-content-center">
+                        <p>@item.Status</p>
+                    </td>
+                    <td class=" text-center align-content-center">
+                        <p>@item.PaymentMod</p>
+                    </td>
+                    <td class=" text-center align-content-center d-flex">
+                        @for(var i=0; i< item.Rating;i++)
+                        {
+                            <i class="bi bi-star-fill Food-stars text-warning"></i>
+                        }
+                        @for(var i=0; i< (5-item.Rating);i++)
+                        {
+                            <i class="bi bi-star Food-stars text-warning"></i>
+                        }
+                    </td>
+                    <td class=" text-center align-content-center">
+                        <p>@item.Total</p>
+                    </td>
+                    <td class=" text-center align-content-center d-flex">
+                        <p data-id="@item.OrderID" class="text-dark btn ExportOrderDetails"><i
+                                class="bi bi-filetype-pdf"></i></p>
+                        <p data-id="@item.OrderID" class="text-dark ViewOrderDetails btn"><i class="bi bi-eye"></i></p>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+
+   
+</div>
+
+ <div aria-label="Page navigation example">
+        <form asp-action="Users" method="post">
+            <ul class="pagination justify-content-end text-center">
+                <li class="page-item m-1">
+                   <small> User per page</small>
+                    @* <input type="text" value="@Model.Search" hidden> *@
+                    <small>
+                        <select name="pagesize" id="orderpagesize" data-size="@Model.PageSize">
+                        <option asp-route-pagesize=3 id="opt3">3</option>
+                        <option asp-route-pagesize=5 id="opt5">5</option>
+                        <option asp-route-pagesize=10 id="opt10">10</option>
+                        <option asp-route-pagesize=15 id=opt15>15</option>
+                    </select>
+                    </small>
+                </li>
+                <li class=" page-item m-1">
+                    <small>Showing <span id="ordercurrentpage">@Model.PageIndex</span> of <span
+                        id="ordertotalpage">@Model.TotalPages</span></small>
+                </li>
+
+                <!-- Previous Button -->
+                <li class="page-item m-1">
+
+                    <small class="page-link" aria-label="Previous" id="order_previous_page">
+                        <span aria-hidden="true">&laquo;</span>
+                    </small>
+                </li>
+                <li class="page-item m-1">
+                    <small class="page-link" aria-label="Next" id="order_next_page">
+                        <span aria-hidden="true">&raquo;</span>
+                    </small>
+                </li>
+            </ul>
+        </form>
+    </div>
+
+</div>
+
+<script>
+
+
+    $(document).ready(function () {
+        // Set selected option from ViewBag.pageSize
+        let opt_value = $("#orderpagesize").data("size");
+        if (opt_value == 3) {
+            $('#opt3').attr('selected', 'selected');
+        } else if (opt_value == 5) {
+            $('#opt5').attr('selected', 'selected');
+        } else if (opt_value == 10) {
+            $('#opt10').attr('selected', 'selected');
+        } else if (opt_value == 15) {
+            $('#opt15').attr('selected', 'selected');
+        }
+
+        @* let sortbit = @ViewBag.sortbit; *@
+        const url = '@Url.Action("GetOrderTable", "Order")';
+        $(".bi-arrow-down").on("click", function () {
+            console.log("------------------------------")
+            let sortname = $(this).data("name");
+                sortbit=1;
+            console.log( $("#ordercurrentpage").val());
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: {
+                    "pageIndex": 1, "pageSize": $("#orderpagesize").val(), 'sortname':sortname, 'sorttype':'desc', 'sortbit':sortbit
+                },
+                success: function (response) {
+                    $('#OrderTableData').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                    console.log(request.responseText)
+                }
+            })
+        });
+        $(".bi-arrow-up").on("click", function () {
+            let sortname = $(this).data("name");
+            console.log(sortname)
+                sortbit=1;
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: {
+                   "pageIndex": 1, "pageSize": $("#orderpagesize").val(), 'sortname':sortname, 'sorttype':'asc', 'sortbit':sortbit
+                },
+                success: function (response) {
+                    $('#OrderTableData').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                    console.log(request.responseText)
+                }
+            })
+        });
+
+    });
+
+</script>

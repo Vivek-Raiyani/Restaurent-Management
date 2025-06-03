@@ -1,0 +1,77 @@
+@model pizzashop.data.ViewModels.AddEditModifier
+
+<div id="addeditmodal" class="modal modal-dialog-scrollable fade " data-bs-backdrop="static" data-bs-keyboard="false"
+    tabindex="-1" aria-labelledby="staticBackdropLabel">
+    <div class="modal-dialog modal-xl  modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-primary" id="staticBackdropLabel"><strong id="Modal-heading">Modifier</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addeditmodiferform">
+                <div class="modal-body ">
+                    <div class="row">
+                        <div class="form-floating margintop col-lg-6 col-md-6">
+                            <button class="btn btn-outline-border  btn-lg dropdown-toggle w-100" type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Select ModifierGroup
+                            </button>
+                            <input type="hidden" asp-for="@Model.ModiferId">
+                            <ul class="dropdown-menu" id="modifiergroupselect">
+                                @foreach (var modifier in @Model.Groups)
+                                {
+                                    <li><input type="checkbox" class="modifier-group-check"  @(Model.GroupIds.Contains(modifier.ModGroupId) ? "checked": "")
+                                     value=@modifier.ModGroupId> @modifier.ModifierName</li>
+                                }
+                            </ul>
+                        </div>
+                        <div class="form-floating  col-lg-6 col-md-6">
+                            <input asp-for="Name" type="text" class="form-control" id="modifiername"
+                                placeholder="Itemname">
+                            <label asp-for="Name" for="modifiername" class="ms-3">Name*</label>
+                            <span class="text-danger"  id="modifiernamevalidate"></span>
+                            <span class="text-danger" asp-validation-for="Name" ></span>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="form-floating  col-lg-4 col-md-6">
+                            <input asp-for="Rate" type="text" class="form-control" id="floatingInput1" placeholder="Price">
+                            <label asp-fonate" for="floatingInput1" class="ms-3">Price*</label>
+                            <span class="text-danger" asp-validation-for="Rate"></span>
+                        </div>
+                        <div class="form-floating  col-lg-4 col-md-6">
+                            <input asp-for="Quantity" type="text" class="form-control" id="floatingInput2"
+                                placeholder="Quantity">
+                            <label asp-for="Quantity" for="floatingInput2" class="ms-3">Quantity*</label>
+                            <span class="text-danger" asp-validation-for="Quantity"></span>
+                        </div>
+                        <div class="form-floating margintop col-lg-4 col-md-6">
+                            <select asp-for="Unit" class="form-select" id="floatingSelect2" aria-label="Floating label"
+                                value="1">
+                                <option selected>Select a Unit</option>
+                                <option value="g">gram</option>
+                                <option value="pcs">Pieces</option>
+                            </select>
+                            <label asp-for="Unit" for="floatingSelect2" class="ms-3">Item Type*</label>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="form-group col-12">
+                            <textarea asp-for="Description" class="form-control" id="exampleFormControlTextarea1"
+                                rows="3" placeholder="Description"></textarea>
+                            <span class="text-danger" asp-validation-for="Description"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-end">
+                    <button type="submit" class="btn btn-yes" data-bs-dismiss="modal">Save</button>
+                    <button type="button" class="btn btn-no" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>

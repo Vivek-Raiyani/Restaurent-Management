@@ -1,0 +1,156 @@
+@model pizzashop.data.ViewModels.ProfileVM
+
+@{
+    ViewData["Title"] = "Home Page";
+    Layout = "_adminlayout";
+}
+
+<div class="d-flex container justify-content-between mt-4 mb-4 ">
+                    <h3 class="text-primary"><strong>Profile</strong></h3>
+                    @if(!User.IsInRole("Chef"))
+                    {
+<a class="btn btn-primary" asp-action="UserMain" asp-controller="Admin" > Back</a>
+                    }   
+                    
+                </div>
+<div class="container">
+<div class="tile pb-5 ">
+    <div class=" text-white ">
+        <img src="~/images/profile_div_bg.jpg" alt="" width="100%" height="100px">
+    </div>
+    <form method="post" class="container " enctype="multipart/form-data">
+        <div class="row">
+            <div class=" col-lg-8 col-12">
+                <div class="d-flex">
+                    <!-- inline class need Two bi-camera removed-->
+                    <div id="upload-btn" style="margin-top: -50px;">
+                        <img src="@Model.ProfileImg" class="rounded-circle" style="object-fit:cover" alt="User Image"
+                            width="125px" height="125px "/>
+
+                    </div>
+                    <!-- need Two handle file upload-->
+                    <!-- inline class need Two bi-camera removed-->
+                    <div class="btn-danger text-center rounded-circle mt-4 me-3 "
+                        style="margin-left: -20px; width: 40px;height:35px;">
+                       <input type="file"  accept="image/jpeg, image/png" asp-for="MyImage" accept="image/jpeg, image/png" hidden onchange="preview()"/>
+                        <label asp-for="MyImage">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                                class="bi bi-camera" viewBox="0 0 16 16">
+                                <path
+                                    d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4z" />
+                                <path
+                                    d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5m0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0" />
+                            </svg>
+                        </label>
+                    </div>
+                    <div class="pt-3">
+<!-- better to disable-->
+                        <p><strong>@Model.Fname @Model.Lname</strong></p>
+                        <p>@Model.RoleName</p>
+                        <input asp-for="@Model.RoleName" value="@Model.RoleName" hidden>
+                        <input asp-for="@Model.Status" value="@Model.Status" hidden >
+                    </div>
+                </div>
+            </div>
+
+           <dIv class="col-sm-4 col-4">
+                <p class="pt-3">@Model.Email</p>
+                <input asp-for="@Model.Email" value="@Model.Email" hidden>
+                <input asp-for="@Model.ProfileImg" value="@Model.ProfileImg" hidden>
+            </div>
+
+            <div class=" row gy-3 gx-3">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="floatingInput" placeholder="" asp-for="Fname"
+                            value="@Model.Fname">
+                            <span asp-validation-for="Fname" class="text-danger"></span>
+                        <label for="floatingInput">First Name</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="floatingInput" placeholder="" asp-for="Lname"
+                             value="@Model.Lname">
+                            <span asp-validation-for="Lname" class="text-danger"></span>
+                        <label for="floatingInput">Last Name</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="username" placeholder="" asp-for='Username'
+                            value="@Model.Username">
+                            <span  class="text-danger" id="usernamevalidate"></span>
+                             <span asp-validation-for="Username" class="text-danger" ></span>
+                        <label for="username">Username</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="phone" placeholder="" asp-for="PhoneNo"
+                            value="@Model.PhoneNo">
+                            <span  class="text-danger" id="phonevalidate"></span>
+                             <span asp-validation-for="PhoneNo" class="text-danger" ></span>
+                        <label for="phone">Phone</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select form-select-lg " id="country" aria-label="Default select example"
+                        asp-for="Country">
+                        <option selected>@Model.Country</option>
+                    </select>
+                     <span asp-validation-for="Country" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select form-select-lg " id="state" aria-label="Default select example"
+                        asp-for="State">
+                        <option selected >Select State</option>
+                        <option selected value="@Model.State">@Model.State</option>
+                    </select>
+                     <span asp-validation-for="State" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select form-select-lg" id="city" aria-label="Default select example"
+                        asp-for="City">
+                        <option selected >Select City</option>
+                        <option selected value="@Model.City">@Model.City</option>
+                    </select>
+                     <span asp-validation-for="City" class="text-danger"></span>
+                </div>
+                <div class="col-md-8">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="floatingInput" placeholder="" asp-for="Address"
+                            value="@Model.Address">
+                             <span asp-validation-for="Address" class="text-danger"></span>
+                        <label for="floatingInput">Address</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="floatingInput" placeholder="" asp-for="Zipcode"
+                            value="@Model.Zipcode">
+                             <span asp-validation-for="Zipcode" class="text-danger"></span>
+                        <label for="floatingInput">Zip Code</label>
+                    </div>
+                </div>
+            </div>
+            <div class=" text-end mt-3">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <a type="submit" class="btn btn-danger" asp-action="UserMain" asp-controller="Admin">Canncle</a>
+            </div>
+        </div>
+    </form>
+</div>
+</div>
+
+@section Scripts
+{
+    <script>
+        function preview() {
+            $("#upload-btn").html( `<img id="frame" src="" class="rounded-circle" style="object-fit:cover" alt="User Image"
+                            width="125px" height="125px "/>`)
+            frame.src=URL.createObjectURL(event.target.files[0]);
+        }
+    </script>
+    <script src="~/js/countrydd.js" asp-append-version="true"></script>
+}

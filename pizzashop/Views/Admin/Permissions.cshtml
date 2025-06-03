@@ -1,0 +1,194 @@
+@model pizzashop.data.ViewModels.PermissionListVM
+
+@{
+    ViewData["Title"] = "Permissions";
+    Layout = "_adminlayout";
+}
+
+<div class="d-flex container justify-content-between mt-5 mb-4">
+    <h3 class="text-primary"><strong>Permissions</strong></h3>
+
+    <a class="btn btn-outline-primary" asp-action="Roles" asp-controller="Admin">
+        Back
+    </a>
+</div>
+
+<form method="post">
+    <div class="container p-5 tile">
+        <div class="col-12 col-sm-6 mb-3 form-floating">
+            <input type="text" class="form-control" id="floatingInput" asp-for="RoleName" value="@Model.RoleName"
+                disabled>
+            <input type="hidden" class="form-control" id="floatingInput" asp-for="RoleName" value="@Model.RoleName">
+            <input type="hidden" asp-for="RoleId" value="@Model.RoleId">
+            <label for="floatingInput" asp-for="RoleName">Role</label>
+        </div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="check_all_permission">
+                            Permissions
+                        </th>
+                        <th>
+                            Can View
+                        </th>
+                        <th>
+                            Can Add/Edit
+                        </th>
+                        <th>
+                            Can Delete
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody id="tablebody">
+                    @for (var i = 0; i < @Model.Permissions.Count(); i++)
+                    {
+                        <tr>
+                            <td class="d-flex ">
+                                <input type="checkbox" class="permission_check" data-id="@Model.Permissions[i].Name">
+                                <p class="m-0"> @Model.Permissions[i].Name</p>
+                                <input type="hidden" asp-for="Permissions[i].Name" value="@Model.Permissions[i].Name">
+                                <input type="hidden" asp-for="Permissions[i].PermissionTypeId"
+                                    value="@Model.Permissions[i].PermissionTypeId">
+
+                            </td>
+                            <td>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input CanView" data-id="@Model.Permissions[i].Name"
+                                        type="checkbox" asp-for="Permissions[i].CanView" data-id="CanView"
+                                        checked="@Model.Permissions[i].CanView" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input CanEdit" data-id="@Model.Permissions[i].Name"
+                                        type="checkbox" asp-for="Permissions[i].CanEdit" data-id="CanEdit"
+                                        checked="@Model.Permissions[i].CanEdit" />
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input CanDelete" data-id="@Model.Permissions[i].Name"
+                                        type="checkbox" asp-for="Permissions[i].CanDelete" data-id="CanDelete"
+                                        checked="@Model.Permissions[i].CanDelete" />
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class=" d-flex justify-content-end">
+                <a class="btn btn-primary me-3" id="submit">Save</a>
+                <a class="btn btn-outline-danger " asp-action="Roles" asp-controller="Admin">Cancel</a>
+            </div>
+        </div>
+</form>
+</div>
+
+
+@section Scripts {
+    <script>
+
+        //  ckeck if all the checkbox is checked
+        function updateCheckAllState() {
+            let totalPermissions = $(".permission_check").length;
+            let checkedPermissions = $(".permission_check:checked").length;
+            $("#check_all_permission").prop("checked", totalPermissions === checkedPermissions);
+        }
+        $(".permission_check").change(updateCheckAllState);
+
+
+        $(document).ready(function () {
+            $(".CanView:checked").each(function(){
+                let id= $(this).data("id");
+                $(`.permission_check[data-id=${id}`).attr("checked",true)
+            })
+            
+            updateCheckAllState();
+
+            let check_all_permission = $("#check_all_permission");
+            let Permissions = $('.permission_check');
+
+            check_all_permission.change(function () {
+                if ($(this).is(':checked')) {
+                    Permissions.each(function () {
+                        if ($(this).is(':checked')) {
+
+                        } else {
+                            $(this).click();
+                        }
+                    })
+                } else {
+                    Permissions.each(function () {
+                        if ($(this).is(':checked')) {
+                            $(this).click();
+                        }
+                    })
+                }
+            })
+
+            Permissions.on("change", function () {
+                let id = $(this).data("id");
+                if ($(this).is(":checked")) {
+                        $(`.CanView[data-id=${id}]`).click();
+
+                } else {
+                    $(`[data-id=${id}]`).each(function(){
+                        if ($(this).is(":checked")) {
+                            $(this).click();
+                        }
+                    });
+                }
+            })
+
+            $(".CanView").on("change", function () {
+                id = $(this).data("id");
+                if ($(this).is(":checked")) {
+                    console.log("can view checked")
+                    if (!$(`.permission_check[data-id=${id}]`).is(":checked")) {
+                        $(`.permission_check[data-id=${id}]`).click();
+                    }
+                } else {
+                    if ($(`.permission_check[data-id=${id}]`).is(":checked")) {
+                        console.log("can view unchecked")
+                        $(`.permission_check[data-id=${id}]`).click();
+                    }
+                }
+            })
+
+            $(".CanEdit").change(function () {
+                if ($(this).is(":checked")) {
+                    console.log("can edit checked")
+                    let id = $(this).data("id");
+                    if (!$(`.CanView[data-id=${id}]`).is(":checked")) {
+                        $(`.CanView[data-id=${id}]`).click();
+                    }
+                }
+            })
+
+            $(".CanDelete").change(function () {
+                if ($(this).is(":checked")) {
+                    console.log("can delete checked")
+                    let id = $(this).data("id");
+                    if (!$(`.CanView[data-id=${id}]`).is(":checked")) {
+                        $(`.CanView[data-id=${id}]`).click();
+                    }
+                }
+
+            })
+
+            let submit = $('#submit');
+
+            submit.on('click', function () {
+                let checkinputs = $('.form-check-input ');
+                $(this).closest("form").submit();
+            })
+
+
+        })
+
+
+    </script>
+}

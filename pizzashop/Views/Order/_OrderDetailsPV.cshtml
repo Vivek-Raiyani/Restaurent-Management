@@ -1,0 +1,224 @@
+@model pizzashop.data.ViewModels.Orders.OderDetailsVM
+
+
+<div class="container mb-2 mt-5">
+    <div class="row gx-3">
+        <div class="col-8">
+            <h3 class="text-primary"><strong>Order-Details</strong></h3>
+        </div>
+        <div class="col-4 d-flex justify-content-end">
+            <a class="btn btn-outline-primary " id="backtoOrderList" asp-action="Index" asp-controller="Order">
+                Back
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container  mb-3 pt-2">
+    <div class="tile">
+        <div class="row p-3 gx-3">
+            <div class="col-8 d-flex ">
+                <h3 class="text-primary">Order Summary</h3>
+                <div>
+                    @if (Model.Status == "completed")
+                    {
+                        <span class="badge bg-success m-0">@Model.Status</span>
+                    }
+                    else if (Model.Status == "cancelled")
+                    {
+                        <span class="badge bg-danger m-0">@Model.Status</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-primary m-0">@Model.Status</span>
+                    }
+                </div>
+
+            </div>
+            <div class="col-4 d-flex justify-content-end">
+                <div>
+                    <button class="btn btn-outline-primary ExportOrderDetails  d-flex " data-id="@Model.OrderID">
+                        <i class="bi bi-box-arrow-in-down-right"></i>
+                        Export
+                    </button>
+                </div>
+
+            </div>
+        </div>
+        <div>
+            <p class="p-3">Invoice No: @Model.InvoiceId</p>
+
+        </div>
+        <div class="d-flex gap-3 p-3">
+            <small>
+                <p>Paid on: @Model.PaidOn</p>
+            </small>
+            <small>
+                <p>Placed on: @Model.PlacedOn</p>
+            </small>
+            <small>
+                <p>Modifierd on: @Model.ModifiedOn</p>
+            </small>
+            @* <small>
+                <p>Order Durationn: @Model.OrderDuration</p>
+            </small> *@
+
+        </div>
+    </div>
+</div>
+
+
+<div class="container  mb-3 pt-2">
+    <div class="row gx-5 gy-3">
+        <div class="col-lg-6  ">
+            <div class="tile p-5 pt-3 pb-3 h-100">
+                <h4 class="mb-2 gap-3 text-primary"><i class="bi bi-person-lines-fill"></i>  Customer Details</h4>
+
+                <p>Name : @Model.Customer.Name</p>
+                <p>Phone : @Model.Customer.Phone</p>
+                <p>No of People : @Model.Customer.Ppl</p>
+                <p>Email : @Model.Customer.Email</p>
+            </div>
+ 
+        </div>
+        <div class="col-lg-6 ">
+            <div class="tile p-5 pt-3 pb-3">
+                <h4 class=" mb-3 d-flex gap-3 text-primary"><img src="../images/icons/dinner-table.svg" alt="tableimg" height="30px"> Table Details</h3>
+                    <p>
+                        Table: @for (var tbl = 0; tbl < Model.Tables.TableNames.Count(); tbl++)
+                        {
+                            if (tbl == Model.Tables.TableNames.Count() - 1)
+                            {
+                                @Model.Tables.TableNames[tbl]
+                            }
+                            else
+                            {
+                                @Model.Tables.TableNames[tbl]
+
+                                <span>,</span>
+                            }
+                        }
+                    </p>
+                    <p class="mb-5">
+                        Section : @Model.Tables.Section
+                    </p>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@if (Model.Items.Count > 0)
+{
+
+    <div class="container mb-3 pt-2">
+        <div class="tile">
+            <h3 class="text-primary mb-2">Order Items</h3>
+            <div class="table-responsive">
+                <table class="table ">
+                    <thead>
+                        <tr class="text-primary">
+                            <th>
+                                Sr.No
+                            </th>
+                            <th>
+                                Item
+                            </th>
+                            <th>
+                                Quantity
+                            </th>
+                            <th>
+                                Price
+                            </th>
+                            <th>
+                                TotalAmount
+                            </th>
+                        </tr>
+                    </thead>
+                    <!-- iteam tabel body -->
+                    <tbody>
+                        @for (var i = 0; i < Model.Items.Count(); i++)
+                        {
+
+                            @* based on no of modifer we need to merger rows *@
+                            <tr>
+                                <td rowspan="@(Model.Items[i].Modifiers.Count()+1)">
+                                    @(i + 1)
+                                </td>
+                                <td>
+                                    @Model.Items[i].Name
+                                </td>
+                                <td>
+                                    @Model.Items[i].Quantity
+                                </td>
+                                <td>
+                                    @Model.Items[i].Price
+                                </td>
+                                <td class="price">
+                                    @(Model.Items[i].Price * Model.Items[i].Quantity)
+                                </td>
+                            </tr>
+                            @for (var j = 0; j < Model.Items[i].Modifiers.Count(); j++)
+                            {
+                                @* modifers loop here *@
+                                <tr>
+                                    <td>
+                                        <i class="bi bi-dot"></i> @Model.Items[i].Modifiers[j].Name
+                                    </td>
+                                    <td>
+                                        @Model.Items[i].Quantity
+                                    </td>
+                                    <td>
+                                        @Model.Items[i].Modifiers[j].Price
+                                    </td>
+                                    <td class="price">
+                                        @(Model.Items[i].Quantity * Model.Items[i].Modifiers[j].Price)
+                                    </td>
+                                </tr>
+                            }
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <div class="tile m-2 me-4">
+                    <p>SubTotal : <span id="subtotal"></span></p>
+                    @foreach (var tax in Model.OrderTax)
+                    {
+                        <p> @tax.Tax.TaxName : <span class="ordertax">@tax.Tax.TaxAmount</span></p>
+                    }
+                    <h5 class="text-primary"> Total : <span id='ordertotal' class="text-black"></span></h5>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+
+<script>
+    $(document).ready(function () {
+        let subtotal = 0;
+        let ordertotal = 0;
+        $('.price').each(function () {
+            console.log(parseInt($(this).html()))
+            subtotal += parseInt($(this).html());
+            console.log(subtotal)
+        });
+
+        $("#subtotal").html(subtotal);
+        ordertotal = subtotal
+
+        $(".ordertax").each(function () {
+            var taxamount = subtotal * parseFloat($(this).html()) * 0.01;
+            $(this).html(taxamount);
+            ordertotal += taxamount;
+        });
+
+        $("#ordertotal").html(ordertotal);
+    });
+
+</script>

@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+nav {
+    background-color: #0066ab;
+}
+
+
+.upload-btn {
+    width: 100%;
+}
+
+.mainclass {
+    display: block;
+    align-items: center;
+    justify-content: center;
+}
+
+.tile {
+    background-color: white;
+    box-shadow: 2px 2px 2px 2px #c9c9c9;
+    margin: auto;
+    padding: 10px;
+}
+
+body {
+    overflow-y: auto;
+    background-color: rgb(241, 241, 241);
+
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+#upload-btn {
+    border: 1px solid;
+}
+
+.btn-check:focus+.btn,
+.btn:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+#sidebar {
+    height: 94vh;
+    background-color: white;
+}
+
+#menu-sidebar {
+    background-color: white;
+}
+
+
+#navbar {
+    height: 8vh;
+}
+
+@media screen and (max-width: 991px) {
+    #sidebar {
+        display: none;
+    }
+    #nav-hero-img {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    #nav-text {
+        display: none;
+    }
+}
+
+@media screen and (min-width: 992px) {
+    #nav-hero-btn-img {
+        display: none;
+    }
+
+    #nav-hero-btn{
+       display: none; 
+    }
+}

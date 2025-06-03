@@ -1,0 +1,333 @@
+@{
+    ViewData["Title"] = "Order";
+    Layout = "_adminlayout";
+}
+
+<div class="container mt-5 " id="ordercontainer">
+    <form>
+        <div class="d-flex row mb-4 gy-2">
+
+            <div class="col-lg-4">
+                <h3 class="text-primary"> <strong>Orders</strong></h3>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="row gy-2">
+                    <div class="col-xl-6  d-flex gap-3 ">
+                        <div class="row gx-2 gy-2 m-0 w-100">
+                            <div class="col-7">
+                                <div>
+                                    <input class="btn w-100 btn-outline-border-primary" type="search"
+                                        placeholder="Search" name="search" id="orderSearch" aria-label="Search">
+                                    <label for="search" id="searchlable" class="position-absolute text-primary"
+                                        style="margin-left: -35px; margin-top: 5px;">
+                                        <i class="bi bi-search"></i>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <select class="form-select" id="orderstatus" aria-label="Floating label" value="1">
+                                    <option selected value="allstatus">All Status</option>
+                                    <option value="onhold">On Hold</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="failed">Failed</option>
+                                    <option value="progress">Progress</option>
+                                    <option value="served">Served</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-xl-6 d-flex gap-3 justify-content-end">
+                        <div class="row gx-2 gy-2 m-0 w-100">
+                            <div class="col-8">
+                                <select class="form-select" id="ordertime" aria-label="Floating label" value="1">
+                                    <option selected value=1>All Time</option>
+                                    <option value=7>Last 7 days</option>
+                                    <option value=30>Last 30 Days</option>
+                                    <option value=0>Current Month</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <button type="button" class="btn btn-primary w-100" id="exportOrder">
+                                    <div class="d-flex justify-content-center">
+                                        <i class="bi bi-box-arrow-in-down-right"></i>
+                                        Export
+                                    </div>
+
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4"></div>
+            <div class="col-lg-8">
+                <div class="row gx-2 gy-2 m-0">
+                    <div class="col-lg-4 col-md-4 col-6">
+                        <input type="date" class="form-control" id="orderstartdate" />
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-6">
+                        <input type="date" class="form-control" id="orderenddate" />
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-6">
+                        <button type="button" class="btn btn-primary w-100" id="orderdaterange">
+                            Search
+                        </button>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-6">
+                        <button type="reset" class="btn btn-outline-primary w-100" id="orderdateclear">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+
+
+
+    <div id="OrderTableData">
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        @* let page = $("#ordercurrentpage").html();
+        let totalPages = $("#ordertotalpage").html(); *@
+            let url = '/Order/GetOrderTable';
+        let page = 0;
+        let totalPages = 0;
+        let opt_value = 0;
+        @* let opt_value = $("#orderpagesize").val(); *@
+
+            function OrderFilterAjax(page = $("#ordercurrentpage").html()) {
+                opt_value = $("#orderpagesize").val();
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: {
+                        "pageIndex": page, "pagesize": opt_value, "search": $('#orderSearch').val(), "status": $("#orderstatus").val(),
+                        "time": $("#ordertime").val(), "startdate": $("#orderstartdate").val(), "enddate": $("#orderenddate").val()
+                    },
+                    success: function (response) {
+                        $('#OrderTableData').html(response);
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                    }
+                });
+            }
+
+        function OrderTablePage() {
+        @* PizzaShopMain *@
+                let urlIndex = '/Order/IndexPV';
+            $.ajax({
+                url: urlIndex,
+                type: "GET",
+                success: function (response) {
+                    $('#PizzaShopMain').html(response);
+                    let urlTable = '/Order/GetOrderTable';
+                    $.ajax({
+                        url: urlTable,
+                        type: "GET",
+                        data: {
+                            "pageIndex": 1, "pageSize": 1
+                        },
+                        success: function (response) {
+                            $('#OrderTableData').html(response);
+                        },
+                        error: function (request, status, error) {
+                            alert(request.responseText);
+                            console.log(request.responseText)
+                        }
+                    });
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                    console.log(request.responseText)
+                }
+            })
+        }
+
+        function OrderDetailsAjax(orderid) {
+            opt_value = $("#orderpagesize").val();
+            let url = '/Order/OrderDetails';
+            console.log("order details " + url);
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: { "OrderId": orderid },
+                success: function (response) {
+                    $('#ordercontainer').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                    console.log(request.responseText);
+                }
+            });
+        }
+
+
+        $(document).on('click', '#order_previous_page', function () {
+            console.log("!!!!!!!!!!!!!!!!!!")
+            page = $("#ordercurrentpage").html();
+            if (page > 1) {
+                console.log("Curre" + page)
+                console.log("-----------------")
+                page--;
+                console.log("currentpage -- " + page)
+                OrderFilterAjax(page);
+            }
+        });
+
+
+        // Next Page Click Handler
+
+        $(document).on('click', '#order_next_page', function () {
+            debugger;
+            console.log("@@@@@@@@@@@@@@@@")
+            page = parseInt($("#ordercurrentpage").html());
+            totalPages = parseInt($("#ordertotalpage").html());
+            if (page < totalPages) {
+                page++;
+                console.log("currentpage -- " + page)
+                OrderFilterAjax(page);
+            }
+        });
+
+
+
+        $(document).on("change", '#orderpagesize', function () {
+            console.log("###############")
+            page = $("#ordercurrentpage").html();
+            OrderFilterAjax();
+        });
+
+        $(document).on("change", '#orderSearch', function () {
+            let search = $(this).val();
+            if (search != undefined && search != "") {
+                $("#searchlable").hide();
+            } else {
+                $("#searchlable").show();
+            }
+            OrderFilterAjax();
+        });
+
+        $(document).on("change", "#orderstatus", function () {
+            
+            OrderFilterAjax();
+        });
+
+        $(document).on("change", "#ordertime", function () {
+            if( $(this).val() == "1" ){
+                console.log("enalbed");
+                $('#orderstartdate').prop("disabled", false);
+                $('#orderenddate').prop("disabled", false);
+            }
+            else{
+                console.log("disabled")
+                $('#orderstartdate').prop("disabled", true);
+                $('#orderstartdate').val("");
+                $('#orderenddate').prop("disabled", true);
+                $('#orderenddate').val("");
+            }
+            OrderFilterAjax();
+        });
+
+        $(document).on("click", "#orderdaterange", function () {
+            console.log("*************")
+            OrderFilterAjax();
+
+        });
+
+        // excel export js
+        $(document).on("click", "#exportOrder", function () {
+            let search = $("#orderSearch").val();
+            let status = $("#orderstatus").val();
+            let time = $("#ordertime").val();
+            var url = '/Order/ExportExcel?search=' + `${search}` + '&time=' + `${time}` + '&status=' + `${status}`;
+
+            console.log(url);
+            window.location.href = url;
+        @* $.ajax({
+                url: url,
+                type: "GET",
+                data: {
+                    "pageIndex": 1, "pageSize": 1, "search": $("#ordersearch").val(), "status": $("#CustomerTimeFilter").val(),
+            "startdate": $("#orderstartdate").val(), "enddate": $("#orderenddate").val()
+            },
+                success: function (response) {
+                    toastr.success('hello');
+                    window.location.href = url;
+            },
+                error: function (request, status, error) {
+            alert(request.responseText);
+            console.log(request.responseText)
+            }
+            });
+            *@
+                                                })
+
+        // pdf export js
+        $(document).on("click", ".ExportOrderDetails", function () {
+            console.log("pdf btn clc");
+            var url = '/Order/OrderInvoice?OrderId=' + $(this).data("id");
+            console.log(url);
+            window.location.href = url;
+        });
+
+        // order details js
+        $(document).on("click", ".ViewOrderDetails", function () {
+            console.log("details btn clc");
+            // #ordercontainer
+            let orderid = $(this).data("id")
+            OrderDetailsAjax(orderid)
+        });
+
+
+        $(document).ready(function () {
+
+        @* OrderTablePage(); *@
+                                            const url = '/Order/GetOrderTable';
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: {
+                    "pageIndex": 1, "pageSize": 3
+                },
+                success: function (response) {
+                    $('#OrderTableData').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                    console.log(request.responseText)
+                }
+            })
+        });
+
+        $("#orderdateclear").click(function () {
+            const url = '/Order/GetOrderTable';
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: {
+                    "pageIndex": 1, "pageSize": 3
+                },
+                success: function (response) {
+                    $('#OrderTableData').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                    console.log(request.responseText)
+                }
+            })
+        });
+
+
+
+    </script>
+}

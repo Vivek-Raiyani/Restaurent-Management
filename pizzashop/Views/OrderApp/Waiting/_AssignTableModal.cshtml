@@ -1,0 +1,40 @@
+@model IEnumerable<pizzashop.data.ViewModels.OrderApp.Tables.OrderSectionVM>
+@* Assign table modal *@
+<div class="modal fade" id="assigntablemodal" tabindex="1" aria-labelledby="exampleModalLabel" >
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="delete-iteam-label">Assign Table</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center d-block">
+                    <div class="row gx-2 gy-2">
+                        <div class="col-sm-6">
+                            <select class="form-select" id="assignfloor" aria-label="Floating label" value="@ViewBag.tokenfloor">
+                                <option selected disabled>Select Floor</option>
+                                @foreach(var floor in Model){
+                                    <option value="@floor.Id" >@floor.Name</option>
+                                }
+                            </select>
+                            
+                        </div>
+                        <div class="col-sm-6">
+                            <button class="form-select " type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Select Tables
+                            </button>
+                            <ul class="dropdown-menu" id="assigntable">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    @* need to be added dynamically *@
+                    <button type="button" id="waitlistassign"  data-bs-dismiss="modal" class="btn btn-primary">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                </div>
+        </div>
+    </div>
+</div>
+
+

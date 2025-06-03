@@ -1,0 +1,150 @@
+@model pizzashop.data.ViewModels.OrderApp.Waiting.AssignTableVM
+
+@* offcanvas code here partial view of it *@
+
+<div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="AssignTableoffcanvas"
+    aria-labelledby="offcanvasWithBothOptionsLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Waiting List</h5>
+    </div>
+    <div class="offcanvas-body ">
+        <table class="table table-borderless">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>No. of Person</th>
+                </tr>
+            </thead>
+            <tbody>
+                @* loop of waitlist for a floor *@
+                @foreach (var token in Model.Tokens)
+                {
+                    <tr>
+                        <td>
+                            <input type="radio" name="tokenselect" class="form-check-input offcanvastokenradio "
+                                data-id="@token.TokenId">
+                        </td>
+                        <td>@token.TokenId</td>
+                        <td>@token.Name</td>
+                        <td>@token.Persons</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+
+        <div>
+            <h1 class="text-primary">
+                Customer Details
+            </h1>
+            <form id="tableassignform">
+                <div id="assignform"></div>
+                <div class="d-flex justify-content-end gap-3 mt-3">
+                    <button type="button" id="assigntable" class="btn btn-primary">Assign</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="offcanvas"
+                        aria-label="Close">Close</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+@* data to be passed to waiting contrller for assign table for order *@
+<script>
+    $(document).on("click", ".offcanvastokenradio", function () {
+        console.log("hello world by radioa");
+        // make request to get token Details
+        let tokenid = $(this).data("id");
+        let url = '@Url.Action("TokenDetails", "WaitingList")';
+        console.log(url + "----" + tokenid);
+        $.ajax({
+            url: url,
+            type: "GET",
+            data: { 'tokenid': tokenid },
+            success: function (response) {
+                console.log(response);
+                $("#waitingemail").val(response.email);
+                $("#floatingInputName").val(response.name);
+                $("#floatingInputPhone").val(response.phone);
+                $("#floatingInputPersons").val(response.persons);
+            },
+            error: function (request, status, error) {
+                alert(request.responseText);
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        let tableselected = [];
+        let url = "@Url.Action("AddWaitingToken", "WaitingList")";
+        console.log("---------------------------");
+        $.ajax({
+            url: url,
+            type: "GET",
+            data: { 'floorid': @Model.Floorid},
+            success: function (response) {
+                console.log(response);
+                $("#assignform").html(response);
+            },
+            error: function (request, status, error) {
+                alert(request.responseText);
+            }
+        });
+
+
+        $(document).on('click', "#assigntable", function () {
+            if (!$("#tableassignform").valid()) {
+                return;
+            }
+            console.log("hello world"),
+
+
+    @foreach (var id in Model.Tableids)
+    {
+        @:tableselected.push(@id);
+    }
+                console.log(tableselected);
+            let requestdata = {
+                tokenid: $("input[name='tokenid']").val(),
+                email: $("#waitingemail").val(),
+                name: $("#floatingInputName").val(),
+                phone: $("#floatingInputPhone").val(),
+                persons: $("#floatingInputPersons").val(),
+                sectionid: $("#WaitingFloor").val(),
+                tableids: tableselected,
+            };
+
+            console.log(requestdata);
+            $.ajax({
+                url: '@Url.Action("AssignTable", "OrderTable")',
+                type: "POST",
+                data: requestdata,
+                success: function (response) {
+                    console.log(response);
+                    let orderid = response;
+                    if(orderid == 0){
+                        toastr.error("error occured while asigning table")
+                        return;
+                    }
+                    console.log(orderid);
+                    if (orderid != undefined) {
+                        let url = "@Url.Action("Index", "OrderMenu")" + `?orderid=${orderid}`;
+                        window.location.replace(url);
+                    } else {
+                        console.log("error occured in passing orderid");
+                    }
+
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+
+        });
+
+    });
+
+</script>

@@ -1,0 +1,349 @@
+@{
+    ViewData["Title"] = "Order App";
+    Layout = "_orderappLayout";
+}
+
+@model IEnumerable<pizzashop.data.ViewModels.OrderApp.Tables.OrderSectionVM>
+
+<div class="container mt-5">
+
+    <div class="row mb-5">
+        <h3 class="col-md-8 text-primary"><strong>Waiting List</strong></h3>
+        <div class="col-md-4 d-flex justify-content-end">
+            <button class="btn btn-outline-primary editwaitingtoken">+<small>Waiting Token</small></button>
+        </div>
+    </div>
+    @* select dd *@
+    <div class=" d-flex justify-content-center btn  ">
+        <div id="navigation-select-div" class="btn btn-outline-border-primary mb-4 w-100">
+
+            <select id="navigation-select" class=" btn w-100 ">
+                <option value="0">All</option>
+                @foreach (var floor in Model)
+                {
+                    <option value="@floor.Id">@floor.Name </option>
+                }
+            </select>
+        </div>
+    </div>
+
+    @* category name list *@
+    <div class="nav nav-pills tile text-primary p-4  gap-3" id="navigation-list" role="tablist">
+        <button class="nav-link active waitingsection position-relative" data-id="0" data-bs-toggle="tab" type="button">All
+            <span id="floor-0"
+                    class="position-absolute top-0 start-100 translate-middle btn bg-light border border-light rounded text-primary ">
+                </span>
+        </button>
+        @foreach (var floor in Model)
+        {
+            @* <button class="nav-link waitingsection" data-id="@floor.Id" data-bs-toggle="tab"
+                type="button">@floor.Name</button>
+            <span  class="bg-secondary m-2 text-center text-white"
+                style="width: 25px;height:25px; border-radius: 10px;"></span> *@
+
+            <button type="button" class="nav-link waitingsection position-relative" data-id="@floor.Id" data-bs-toggle="tab">
+                @floor.Name
+                <span id="floor-@floor.Id"
+                    class="position-absolute top-0 start-100 translate-middle btn bg-light border border-light rounded text-primary">
+                </span>
+            </button>
+        }
+
+    </div>
+
+
+    <div class="container tile mt-5">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#Token No</th>
+                        <th>Created At</th>
+                        <th>Waiting Time</th>
+                        <th>Name</th>
+                        <th>No of Persons</th>
+                        <th>Phone number</th>
+                        <th>Email</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tokentablebody">
+
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+</div>
+
+@* placeholder for all modal *@
+<div id="tokenmodal"></div>
+
+
+@* Delete token modal *@
+<div class="modal fade" id="deletewaitingtoken" tabindex="1" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="delete-iteam-label">Delete Confirmation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center d-block">
+                    <img src="~/images/warning-icon.svg" alt="warning" width="50px">
+                    <p>Are you sure you want to delete this iteam ?</p>
+                    @* we need to add token id *@
+                    <input hidden id="deleteid">
+                </div>
+                <div class="modal-footer justify-content-center">
+                    @* need to be added dynamically *@
+                    <button type="submit" id="deletetoken" class="btn btn-primary">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+
+            let requestdata = {};
+
+            requestdata = { "floorid": 0 };
+            let url = "@Url.Action("TokenTable", "WaitingList")";
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: requestdata,
+                success: function (response) {
+                    console.log(response);
+                    $("#tokentablebody").html(response);
+                    requestdata = {};
+
+                    let sections = $(".waitingsection");
+                    sections.each(function () {
+                        let id = $(this).data("id");
+                        let spanid = "floor-" + id;
+                        let waitingcount = 0;
+                        if ($(this).data("id") == 0) {
+                            waitingcount = $(".assignwaitingtoken").length;
+                        } else {
+                            $(".assignwaitingtoken").each(function () {
+                                if ($(this).data("floor") == id) {
+                                    waitingcount++;
+                                }
+                            });
+
+                        }
+                        $(`#${spanid}`).html(waitingcount);
+                        console.log(`-------------------${spanid}`, waitingcount);
+                    });
+
+
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                    console.log(request.responseText)
+                }
+            });
+
+
+
+            $(document).on("click", '.waitingsection', function () {
+                console.log("handling waitingsection change");
+                // ajax call
+                // data-id
+                // 2 things to pass id of category and the status 
+                let requestdata = { "floorid": $(this).data("id") };
+                let url = "@Url.Action("TokenTable", "WaitingList")";
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: requestdata,
+                    success: function (response) {
+                        console.log(response);
+                        $("#tokentablebody").html(response);
+
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                        console.log(request.responseText)
+                    }
+                });
+
+            });
+
+            $(document).on("change", '#navigation-select', function () {
+                console.log("handling waitingsection change");
+                // ajax call
+                // data-id
+                // 2 things to pass id of category and the status 
+                let requestdata = { "floorid": $(this).val() };
+                let url = "@Url.Action("TokenTable", "WaitingList")";
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: requestdata,
+                    success: function (response) {
+                        console.log(response);
+                        $("#tokentablebody").html(response);
+
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                        console.log(request.responseText)
+                    }
+                });
+
+            });
+
+            $(document).off('click', '.editwaitingtoken').on('click', '.editwaitingtoken', function () {
+                console.log('edit token');
+                let id = $(this).data("id");
+                if (id == undefined) {
+                    id = 0;
+                }
+                console.log(id);
+                let url = '@Url.Action("UpdateWaitingToken", "WaitingList")';
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: { "tokenid": id },
+                    success: function (response) {
+                        console.log(response);
+                        $("#tokenmodal").html(response);
+                        $("#WaitingTokenModal").modal('show');
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                    }
+                });
+
+            });
+
+
+            $(document).on('click', '.deletewaitingtoken', function () {
+                console.log('delete token');
+                $("#deleteid").val($(this).data("id"));
+                console.log($("#deleteid").val());
+                $('#deletewaitingtoken').modal("show");
+
+            });
+
+            $(document).on('click', '.assignwaitingtoken', function () {
+                console.log('assign token submit');
+                let id = $(this).data("id");
+                // to transer the data to main object
+                let url = '@Url.Action("AssignTableModal", "WaitingList")';
+                requestdata["tokenid"] = $(`.tabletokenid-${id}`).first().html();
+                requestdata["email"] = $(`.tabletokenemail-${id}`).first().html();
+                requestdata["name"] = $(`.tabletokenname-${id}`).first().html();
+                requestdata["phone"] = $(`.tabletokenphone-${id}`).first().html();
+                requestdata["persons"] = $(`.tabletokenpersons-${id}`).first().html();
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: { "floorid": $(this).data("floor") },
+                    success: function (response) {
+                        console.log(response);
+                        $("#tokenmodal").html(response);
+                        $("#assigntablemodal").modal('show');
+
+
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                    }
+                });
+
+            });
+
+            $(document).on("change", "#assignfloor", function () {
+                console.log('assign token floor change');
+                let url = '@Url.Action("AvailableTables", "WaitingList")';
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: { "floorid": $(this).val() },
+                    success: function (response) {
+                        console.log(response);
+                        // loop to append options
+                        $("#assigntable").html("");
+                        response.forEach(function (table) {
+
+                            $("#assigntable").append(` <li class="text-center"><input type="checkbox" class="table-select"  value=${table.id}> ${table.name}</li> `);
+                        });
+
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                    }
+                });
+            });
+
+
+            $("#deletetoken").on("click", function () {
+                let url = "@Url.Action("Delete", "WaitingList")";
+                let requestdata = { "tokenid": $("#deleteid").val() };
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: requestdata,
+                    success: function (response) {
+                        console.log(response);
+                        $("#tokentablebody").html(response);
+
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                        console.log(request.responseText)
+                    }
+                });
+            });
+
+
+            $(document).on("click", "#waitlistassign", function () {
+                console.log("request made")
+
+                requestdata["sectionid"] = $("#assignfloor").val();
+                let tableids = [];
+                $(".table-select:checked").each(function () {
+                    tableids.push($(this).val());
+                });
+                requestdata["tableids"] = tableids;
+
+                console.log(requestdata);
+                $.ajax({
+                    url: '@Url.Action("AssignTable", "OrderTable")',
+                    type: "POST",
+                    data: requestdata,
+                    success: function (response) {
+                        console.log(response);
+                        let orderid = response;
+                        console.log(orderid);
+                        if (orderid != undefined && orderid != 0) {
+                            let url = "@Url.Action("Index", "OrderMenu")" + `?orderid=${orderid}`;
+                            window.location.replace(url);
+                        } else {
+                            console.log("error occured in passing orderid");
+                        }
+
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                    }
+                });
+            });
+
+
+        });
+
+    </script>
+}

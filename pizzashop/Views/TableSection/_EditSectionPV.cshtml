@@ -1,0 +1,33 @@
+@model pizzashop.data.ViewModels.TableSection.SectionSidebarVM
+
+<!-- Modal edit Section -->
+<div class="modal fade" id="EditSection" tabindex="-1" aria-labelledby="EditSection">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-primary"><strong>Edit Section</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+<form id="editsectionform">
+                <div class="modal-body ">
+                    <input id="SectionId" asp-for="SectionId"  type="hidden" value="@Model.SectionId">
+                    <input class="form-control mb-3" id="EditSectionName" asp-for="SectionName"  type="text" 
+                        placeholder="Name*" value="@Model.SectionName">
+                        <span class="text-danger"   id="sectionnamevalidate"></span>
+                        <span class="text-danger"  asp-validation-for="SectionName" ></span>
+                    <input class="form-control" id="EditSectionDesc" type="textarea" row="5" asp-for="Description"
+                        placeholder="Description*" value="@Model.Description">
+                        <span class="text-danger" asp-validation-for="Description"></span>
+                </div>
+                <div class="modal-footer ">
+                    <button type="submit" class="btn btn-primary">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>

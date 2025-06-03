@@ -1,0 +1,89 @@
+@model List<pizzashop.data.ViewModels.ItemGroups>
+
+
+<div class="modal fade show" id="add-modifiers-modal" tabindex="-1" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body ">
+                @if (!Model.Any())
+                {
+                    <div class="text-center">No Modifier Groups Applicable For This Item!</div>
+                }
+                @foreach (var group in Model)
+                {
+                    <div class="modifier-group mb-3 modifier-for-item">
+                        <div><span class="fs-5 fw-semibold me-2">@group.GroupName</span><small>
+                                (You can choose Minimum - <span id="Min-@group.GroupName.Replace(" ","")">@group.Min</span>
+                                & Maximum - <span id="Max-@group.GroupName.Replace(" ","")">@group.Max</span>
+                                options)</small></div>
+                        <div class="d-flex flex-wrap gap-3">
+                            @foreach (var modifier in group.Modifiers)
+                            {
+                                <input type="checkbox" class="modifier-checkboxes "
+                                    id="modifier-@group.GroupName-@modifier.ModifierId" data-id="@modifier.ModifierId"
+                                    data-name="@modifier.Name" data-rate="@modifier.Price"
+                                    data-group="@group.GroupName.Replace(" ", "")">
+                                <label for="modifier-@group.GroupName-@modifier.ModifierId"
+                                    class="modifier-card  border border-secondary rounded-1" role="button"
+                                    data-id="@modifier.ModifierId">
+                                    <div class="modifier-card-body d-flex flex-column p-2">
+                                        <p>@modifier.Name</p>
+                                        <p>Rs. @modifier.Price</p>
+                                    </div>
+                                </label>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer" id="item-modifier-modal">
+                <a id="order-item-add-btn" type="button" class="btn btn-primary bg-header me-2 rounded-1 px-3"
+                    data-bs-dismiss="modal">Add</a>
+                <button type="button" class="btn text-primary bg-white text-header border-primary rounded-1 px-3"
+                    data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        let queryString = window.location.search;
+        queryString = queryString.slice(0, 8); // Output: "?param1=value1&param2=value2"?orderid=71
+        if (queryString != "?orderid") {
+            console.log("hello")
+            $('#item-modifier-modal').hide();
+        }
+
+        $(".modifier-checkboxes").on("click", function () {
+
+            let groupname = $(this).data("group");
+            let min = parseInt($(`#Min-${groupname}`).html());
+            let max = parseInt($(`#Max-${groupname}`).html());
+            console.log(min, max)
+            let modpergroup = $(`.modifier-checkboxes[data-group = ${groupname}]:checked`);
+            if ($(this).is(":checked")) {
+
+                if (modpergroup.length > max) {
+                    toastr.error("you can;t select more than " + max + " modifiers");
+                    $(this).prop("checked", false);
+                }
+            }
+            else {
+                if (modpergroup.length + 1 < min) {
+                    toastr.error("you must select atleast than " + min + " modifiers");
+                    $(this).prop("checked", true);
+                }
+            }
+
+        });
+
+    });
+
+</script>

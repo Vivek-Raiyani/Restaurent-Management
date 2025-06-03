@@ -1,0 +1,130 @@
+@model pizzashop.data.ViewModels.OrderApp.Kot.OrderModalVM
+
+<div class="modal modal-dialog-scrollable fade" id="WaitingTokenModal" data-bs-backdrop="static"
+    data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" >
+    <div class="modal-dialog  modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Order Id - #@Model.Orderid</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            @* form data to be submited *@
+            <div class="modal-body">
+
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Item</th>
+                                <th scope="col">Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr class="itemrows" data-id="@item.OrderDetailsid">
+                                    <td style="border:none" class="kotitemcolumn">
+                                        <div class="d-flex">
+                                            <input type="checkbox" class="kotitemcheckbox-@item.OrderDetailsid">
+                                            <p class="m-0 ms-2 kotitemname" data-id="@item.OrderDetailsid">@item.Item</p>
+                                        </div>
+                                        @if (item.Modifier.Count > 0)
+                                        {
+                                            <ul class="m-0">
+                                                @foreach (var mod in item.Modifier)
+                                                {
+                                                    <li>@mod.Name</li>
+                                                }
+                                            </ul>
+                                        }
+
+                                    </td>
+                                    <td class="  d-flex justify-content-center kotorderquantity p-2 m-2"
+                                        style="border: none;">
+                                        <div class="btn btn-outline-border-primary">
+                                            <div class="row m-0 ">
+                                                <div class="col-4 subtractbtn " data-id="@item.OrderDetailsid">
+                                                    <button class="btn text-primary" ><strong>-</strong></button>
+                                                </div>
+                                                <div class="col-4 kotitemquantity text-center m-auto">
+                                                    
+                                                    @if (ViewBag.status == "ready")
+                                                    {   
+                                                        <span id="itemcount-@item.OrderDetailsid" hidden>@item.Prepared</span>
+                                                        <span id="itemquatity-@item.OrderDetailsid">@item.Prepared</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span id="itemcount-@item.OrderDetailsid" hidden>@item.Quantity</span>
+                                                        <span id="itemquatity-@item.OrderDetailsid">@item.Quantity</span>
+                                                    }
+                                                </div>
+                                                <div class="col-4 addbtn" data-id="@item.OrderDetailsid">
+                                                    <button class="btn text-primary"><strong>+</strong></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="modal-footer d-flex justify-content-end">
+                    @if (ViewBag.status == "ready")
+                    {
+                        <button type="button" class="btn btn-yes btn-primary" id="kotprogressbtn"
+                            data-orderid="@Model.Orderid" data-status="inprogress">Mark as In Progress</button>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-yes btn-primary" id="kotpreparedbtn"
+                            data-orderid="@Model.Orderid" data-status="ready">Mark as Prepared</button>
+                    }
+                    <button type="button" class="btn btn-no btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+
+
+        $(".addbtn").click(function () {
+            let id= $(this).data("id");
+            let element = $(`#itemquatity-${id}`);
+            console.log(element);
+            let max = $(`#itemcount-${id}`).html();
+            console.log(max)
+            console.log("--------------");
+            let quantity = parseInt(element.html());
+            if (quantity < max) {
+                quantity++;
+            }
+            element.html(quantity)
+        });
+
+        $(".subtractbtn").click(function () {
+             let id= $(this).data("id");
+            let element =  $(`#itemquatity-${id}`);
+            console.log(element);
+            console.log("-----------");
+            let quantity = parseInt(element.html());
+            if (quantity > 1) {
+                quantity--;
+            }
+            element.html(quantity)
+
+        });
+
+    })
+
+</script>

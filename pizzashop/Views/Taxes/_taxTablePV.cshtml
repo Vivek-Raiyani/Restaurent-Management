@@ -1,0 +1,63 @@
+@model IEnumerable<pizzashop.data.ViewModels.Taxes.TaxesListVM>
+
+<div class="tile">
+            <div class="table-responsive p-4">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>isEnabled</th>
+                            <th>Default</th>
+                            <th class="text-center">Tax Value</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr class="">
+                                <td>@item.TaxName</td>
+                                <td>@item.TaxType</td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch"
+                                             @(item.IsEnabled ? "checked" : "") disabled>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch"
+                                            mailto:id="flexswitchcheckdefault1-@item.TaxId" @(item.IsDefault ? "checked" : "") disabled>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    @if (@item.TaxType == "percentage")
+                                    {
+                                        <p>@item.TaxValue%</p>
+                                    }
+                                    else
+                                    {
+                                        <p>@item.TaxValue₹</p>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a class="btn btn-link text-dark p-0 editTax" data-id="@item.TaxId">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        @if((bool)Context.Items["CanDelete"] == true){
+
+                                           <a class="btn btn-link text-dark p-0 deleteTax" data-bs-toggle="modal"
+                                            data-id="@item.TaxId" data-bs-target="#SingleDeleteModal">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>

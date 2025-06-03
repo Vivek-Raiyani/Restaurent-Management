@@ -1,0 +1,86 @@
+@model pizzashop.data.ViewModels.AddEditGroup
+
+<!-- add moddifer model group-->
+<div class="modal fade" id="addeditmodal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-primary" id="add-category-label"><strong id="Modal-heading">Modifier</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="add-modifier-group-form">
+            <div class="modal-body">
+                
+                    <input hidden asp-for="@Model.Id">
+                    <input class="form-control mb-3" type="text" asp-for="@Model.Name" id="AddModifierName"
+                        placeholder="Name*">
+                        <span class="text-danger"  id="AddModifierNamevalidate"></span>
+                    <span class="text-danger" asp-validation-for="@Model.Name" ></span>
+
+                    <input class="form-control" type="textarea" row="5" asp-for="@Model.Description"
+                        id="AddModidiferDescription" placeholder="Description*">
+                    <span class="text-danger" asp-validation-for="@Model.Description"></span>
+
+                    <p class="btn btn-link AddExistingModifier">
+                        + Add Existing Modifier
+                    </p>
+                    <p>Modifiers selected</p>
+                    <div class="existsModifier row m-0 w-100">
+                        @* existing modifier show *@
+                        @if(Model != null){
+                            @foreach (var mod in Model.Modifier)
+                            {
+                            <div class="col-lg-3 col-md-4 col-sm-6">
+                                <div class="d-flex justify-content-between">
+                                    <p class="selectedmodifier m-0" data-id=@mod.Id data-mappingid=@mod.MappingId> @mod.Name </p>
+                                    <button class="btn removeselectedmodifier p-0"><i class="bi bi-trash"></i></button>
+                                </div>
+                            </div>
+                            }
+                        }
+                    </div>
+                
+            </div>
+            <div class="modal-footer ">
+
+                <button type="submit" class="btn btn-primary" id="AddModifierSubmit" data-bs-dismiss="modal">Yes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* exisiting modifier modal *@
+<div class="modal fade" id="ModiferModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                <button type="button" class="btn-close SelectedModifierCancel" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="AddExistingModifierModel">
+                    @* *@
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary SelectedModifierCancel"
+                    data-bs-dismiss="modal">Close</button>
+                <button type="button" id="AddSelectedModifier" class="btn btn-primary" data-bs-dismiss="modal">Save
+                    changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+
+<script>
+</script>

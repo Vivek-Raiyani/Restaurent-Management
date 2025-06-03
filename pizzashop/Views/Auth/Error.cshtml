@@ -1,0 +1,76 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>404 - Page Not Found</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #d5edf9; /* Light blue */
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+          
+            margin-right: 10px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            color: #0366b4;
+            font-weight: bold;
+        }
+
+        .error-code {
+            font-size: 96px;
+            font-weight: bold;
+            color: #0366b4;
+        }
+
+        .error-title {
+            font-size: 20px;
+            margin: 20px 0 10px;
+            color: #333;
+        }
+
+        .error-subtext {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo">
+        <img src="~/images/pizzashop_logo.png" alt="Pizzashop Logo" height="100px"> <!-- Replace with actual logo -->
+        <div class="logo-text">PIZZASHOP</div>
+    </div>
+
+    <div class="error-code">404</div>
+    <div class="error-title">Page Not Found</div>
+    <div class="error-subtext">Oops, the page you're looking for isn't here.</div>
+
+</body>
+</html>

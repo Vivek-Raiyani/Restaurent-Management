@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+nav{
+    background-color: #0066ab;
+}
+#sidebar{
+    background-color: white;
+}
+
+#navbar{
+    height: 8vh;
+}
+
+#menu-sidebar{
+    background-color: white;
+}
+
+.upload-btn{
+    width: 100%;
+}
+.mainclass{
+    padding:10px 0;
+    display: block;
+    align-items: center;
+    justify-content: center;
+}
+
+body{
+    background-color:gainsboro;
+}
+
+a{
+    text-decoration: none;
+    color: black;
+}
+
+#upload-btn{
+    border: 1px solid;
+}
+
+.btn-check:focus+.btn, .btn:focus{
+    outline: none;
+    box-shadow: none;
+}
+#sidebar{
+    height: 92vh;
+}
+
+@media screen and (max-width: 991px) {
+    .orderappbtn{
+        width: 40px;
+        border: 1px solid white;
+        
+    }
+
+    .orderapptext{
+        display: none;
+    }
+}
+
+@media screen and (min-width : 992px) {
+    .orderappbtn{
+        width: 100%;
+        border: 1px solid white;
+    }
+
+    .orderapptext{
+        font-size: .650em;
+    }
+
+}

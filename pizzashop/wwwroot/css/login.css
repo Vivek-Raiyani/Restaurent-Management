@@ -1,0 +1,53 @@
+body{
+    background-color: lightblue;
+    margin-bottom: 0px;
+}
+
+.main{
+    height: 100vh;
+}
+.hero-img{
+    height: 100%;
+    /*opacity: .5;*/
+}
+
+.page-text{
+    color: #447a9c;
+}
+
+.remember{
+    margin-left: 0px;
+}
+
+.page-linking{
+    width: 100%;
+}
+
+
+/* .form-floating>.form-control-plaintext~label, .form-floating>.form-control:focus~label, .form-floating>.form-control:not(:placeholder-shown)~label, .form-floating>.form-select~label {
+    color: rgba(var(--bs-body-color-rgb), .65);
+    transform: scale(.85) translateY(-1.5rem) translateX(.15rem);
+} */
+
+
+@media screen and (max-width: 992px) {
+    #hero{
+        display: none;
+    }
+
+    .main{
+        background-size: cover;
+        background-position: center;
+        background-image: url('../images/dominos_background.jpg');
+    }
+
+    #login-background{
+        background-color: azure;
+        opacity: .8;
+    }
+
+    #login-content{
+        opacity: 1;
+    }
+  }
+

@@ -1,0 +1,74 @@
+@model pizzashop.data.ViewModels.AuthVM
+
+@{
+    ViewData["Title"] = "Login Page";
+    Layout = "_authlayout";
+}
+
+
+<div class="container">
+    <div class="d-flex mb-4 justify-content-center align-items-center">
+        <img src="~/images/pizzashop_logo.png" alt="logo" width="125px">
+        <h2 class="page-text">Pizza Shop</h2>
+    </div>
+    <div class="container">
+        <h3 class="mb-3"> Welcome,</h3>
+
+        <form class="" method="post">
+            <div class=" mb-3 position-relative">
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="floatingInput" asp-for="Email"
+                        placeholder="name@example.com">
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                    <label for="floatingInput">Email address</label>
+                </div>
+
+                
+            </div>
+
+            <div class=" mb-3 position-relative">
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="floatingPassword" asp-for="Password"
+                        placeholder="Password">
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                    <label for="floatingPassword" asp-for="Password">Password</label>
+                </div>
+                <label class="position-absolute top-0 end-0 mt-3 me-2 bg-white" id="passwordToggle"><img
+                        src="pizzashop/images/icons/customer.svg" alt="" width="20px"><i class="bi bi-eye-slash-fill"></i></label>
+               
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <div class=" mb-4 ">
+                    <input type="checkbox" asp-for="RememberMe" value="true" name="rememberme"/> 
+                    <label for="RememberMe">Remember me</label> 
+                </div>
+                <a class="text-decoration-none page-text" asp-action="ForgetPass" >Forget Password?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary mb-4 page-linking" asp-action="Index">Login</button>
+        </form>
+
+    </div>
+
+</div>
+
+@section Scripts{
+    <script>
+        let passwordToggle = $('#passwordToggle');
+        let password = $("#floatingPassword");
+        var toggle = true;
+        passwordToggle.on("click",function(){
+            
+            if (toggle) {
+                password.attr('type', 'text');
+                toggle = false;
+                console.log(toggle)
+            } else {
+                password.attr('type', 'password');
+                toggle = true;
+                console.log(toggle)
+            }
+        })   
+    </script>
+}

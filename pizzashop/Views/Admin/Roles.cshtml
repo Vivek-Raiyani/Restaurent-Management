@@ -1,0 +1,26 @@
+@model pizzashop.data.Models.Role;
+
+@{
+    ViewData["Title"] = "Roles";
+    Layout = "_adminlayout";
+}
+
+
+<div class="container mt-5 p-5">
+    <div class="container p-5 tile">
+        <div class="d-flex justify-content-between">
+            <p class="m-0">Role</p>
+            <p class="m-0">Action</p>
+        </div>
+        <hr>
+
+        @foreach(var role in ViewBag.roles){
+            <div class="d-flex justify-content-between">
+            <p class="m-0">@role.RoleName</p>
+            
+            <a class="pe-3" asp-action="Permissions" asp-controller="Admin" asp-route-roleid=@role.RoleId><i class="bi bi-pencil"></i> </a>
+        </div>
+        <hr>
+        }
+    </div>
+</div>

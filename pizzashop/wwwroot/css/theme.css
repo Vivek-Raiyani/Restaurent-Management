@@ -1,0 +1,149 @@
+.navbar {
+    background-color: #0066ab;
+}
+
+.text-primary{
+    --bs-text-opacity: 1;
+    color: rgba(0,102,171, var(--bs-text-opacity)) !important;
+}
+.text-warning{
+    --bs-text-opacity: 1;
+    color: rgb(230, 167, 51);
+}
+
+.btn-primary{
+    background-color: #0066ab;
+}
+
+
+.btn-outline-border-primary{
+    border-color: #0066ab;
+}
+
+.btn-outline-border-warning{
+    border-color: rgb(230, 167, 51);
+}
+
+.btn-outline-border{
+    border-color: black;
+}
+
+.btn-outline-primary{
+    border-color: #0066ab;
+}
+
+.btn-outline-primary:hover {
+    color: #fff;
+    background-color: #0066ab;
+    border-color: #0066ab;
+}
+
+.btn-primary:disabled {
+    color: #fff;
+    background-color: #0066ab;
+    border-color: #0066ab;
+    opacity: .8;
+}
+
+input[type="checkbox"]:checked{
+    background-color: #0066ab; 
+}
+  
+input[type="radio"]:checked{
+    background-color: #0066ab; 
+}
+
+.success{
+    background-color: aquamarine;
+}
+
+.warning{
+    background-color: rgb(230, 167, 51);
+}
+
+.bg-skin{
+    background-color: antiquewhite;
+}
+
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: #fff;
+    background-color: #0066ab;
+}
+
+.tile {
+    background-color: white;
+    box-shadow: 2px 2px 2px 2px #c9c9c9;
+    margin: auto;
+    padding: 10px;
+}
+
+.accordion-button:not(.collapsed) {
+    color: black; 
+    background-color : #fff; 
+    box-shadow: none;
+}
+
+.sidebarscroll{
+    max-height: 350px; 
+    overflow-y: auto;
+}
+
+p{
+    margin: 0px;
+}
+
+body {
+    overflow-y: auto;
+    background-color: rgb(241, 241, 241);
+
+}
+
+#mainbody{
+    height: 94vh;
+    overflow-y: auto;
+}
+
+@media screen and (max-width: 991px) {
+    #sidebar {
+        display: none;
+    }
+    #nav-hero-img {
+        display: none;
+    }
+    
+    #navigation-list{
+        display: none;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    #nav-text {
+        display: none;
+    }
+}
+
+
+@media screen and (min-width: 992px) {
+    #nav-hero-btn-img {
+        display: none;
+    }
+
+    #nav-hero-btn{
+       display: none; 
+    }
+
+    #navigation-select{
+        display: none;
+    }
+    #navigation-select-div{
+        display: none;
+    }
+    
+}
+
+@media screen and (max-width: 567px) {
+    html{
+        font-size: x-small;
+    }
+}

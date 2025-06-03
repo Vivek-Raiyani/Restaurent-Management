@@ -1,0 +1,380 @@
+@model pizzashop.data.ViewModels.ModifierTableVM
+
+
+<!-- we need to make pagination here as well -->
+
+<!-- iteam table partial view -->
+<div id="pagecontent" class="pt-4">
+    <h3 class="text-primary"> <strong>Modifier</strong></h3>
+    <div class="row gx-2 gy-2 m-0">
+        <div class="col-lg-4 col-md-4"></div>
+        <div class="col-lg-4 col-md-4 col-12">
+            <input class="btn me-2 w-100 btn-outline-border-primary Modifier-search" type="search" placeholder="Search" name="search" 
+                value="@Model.Modifiers.Search"  aria-label="Search">   @* id="Modifier-search" *@
+            @if (Model.Modifiers.Search == null)
+            {
+                <label for="Modifier-search"  style="margin-left: -35px; margin-top: 5px;">
+                    <i class="bi bi-search text-primary"></i>
+                </label>
+            }
+        </div>
+        <div class="col-lg-1 col-md-1 col-2 ">
+            <button type="button"   class="btn  btn-outline-secondary w-100 MassDeleteBtn" data-name="modifier"  data-bs-toggle="modal" data-bs-target="#SingleDeleteModal">
+                <img class=" icon-img" src="~/images/rubbish-bin-svgrepo-com.svg" alt="">
+            </button>
+        </div>
+        <div class="col-lg-3 col-md-3 col-10">
+            <button type="button" class="btn  btn-outline w-100" id="AddModifierBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus"
+                    viewBox="0 0 16 16">
+                    <path
+                        d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4">
+                    </path>
+                </svg>Add Modifer
+            </button>
+        </div>
+    </div>
+
+
+@if(Model.Modifiers.Items.Count == 0){
+    <p> no item found</p>
+}else{
+
+
+    <div class="table-responsive p-4">
+        <table class="table">
+            <!-- iteam table head -->
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" id="ModifierGroupId" data-id="@Model.ModiferGroupId">
+                    </th>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Unit
+                    </th>
+                    <th>
+                        Rate
+                    </th>
+                    <th>
+                        Quantity
+                    </th>
+                    <th>
+                        Action
+                    </th>
+                </tr>
+            </thead>
+            <!-- iteam tabel body -->
+            <tbody>
+                @for (var i = 0; i < @Model.Modifiers.Items.Count(); i++)
+                {
+                    <tr>
+                        <td class="align-content-center">
+                            <input type="checkbox" class="modiferitem" data-id="@Model.Modifiers.Items[i].ModifierId">
+                            @* <input type="hidden" asp-for="ModiferGroupId" value="@Model.ModiferGroupId"> *@
+                            <input type="hidden" asp-for="@Model.Modifiers.Items[i].ModifierId"
+                                value="@Model.Modifiers.Items[i].ModifierId">
+                        </td>
+                        <td class="text-center align-content-center">
+                            <div class="d-flex">
+                                @* <img class="icon-img me-2" src="pizzashop/images/dining-menu.png" alt="itemimage"> *@
+                                <small>@Model.Modifiers.Items[i].ModName</small>
+                            </div>
+                        </td>
+                        <td class="text-center align-content-center">
+                            @Model.Modifiers.Items[i].Unit
+                        </td>
+                        <td class="text-center align-content-center">
+                            @Model.Modifiers.Items[i].Rate
+                        </td>
+                        <td class="text-center align-content-center">
+                            @Model.Modifiers.Items[i].Quantity
+                        </td>
+
+                        @* model buttons *@
+                        <td class=" text-center align-content-center">
+                            <button type="button" class="btn EditModifier" data-id="@Model.Modifiers.Items[i].ModifierId">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button type="button" class="btn p-auto DeleteModifier" data-name="modifier"
+                                data-id="@Model.Modifiers.Items[i].ModifierId" data-bs-toggle="modal"
+                                data-bs-target="#SingleDeleteModal">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        
+
+    </div>
+    <div aria-label="Page navigation example">
+                <ul class="pagination justify-content-end text-center">
+                    <li class="page-item m-1">
+                       <small> Modifiers per page</small>
+                        <small>
+                            <select name="pagesizeModifer" class="pagesizeModifer" data-size ='@Model.Modifiers.PageSize' id="pagesizeModifer">
+                            <option asp-route-pagesize=3 id="Modopt3">3</option>
+                            <option asp-route-pagesize=5 id="Modopt5">5</option>
+                            <option asp-route-pagesize=10 id="Modopt10">10</option>
+                            <option asp-route-pagesize=15 id='Modopt15'>15</option>
+                        </select>
+                        </small>
+                    </li>
+                    <li class=" page-item m-1">
+                        <small>Showing @Model.Modifiers.PageIndex of @Model.Modifiers.TotalPages</small>
+                    </li>
+
+                    <!-- Previous Button -->
+                    <li class="page-item m-1">
+                        <small class="page-link previous_page_Modifer" id="previous_page_Modifer" aria-label="Previous"  data-currentpage="@Model.Modifiers.PageIndex"
+                            data-url="@Url.Action("ModifierTable", "Menu")">
+                            <span aria-hidden="true">&laquo;</span>
+                        </small>
+                    </li>
+                    <li class="page-item m-1">
+                        <small class="page-link next_page_Modifer" id="next_page_Modifer" aria-label="Next" data-totalpage="@Model.Modifiers.TotalPages"
+                            data-url="@Url.Action("ModifierTable", "Menu")">
+                            <span aria-hidden="true">&raquo;</span>
+                        </small>
+                    </li>
+                </ul>
+        </div>
+}
+    
+</div>
+
+@* <!-- Modal delete Modifier Item -->
+    <div class="modal fade" id="DeleteModifierModal" tabindex="1" aria-labelledby="exampleModalLabel"
+        aria-hidden="false">
+        <form asp-action="DeleteModifierItem" asp-controller="Menu">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="delete-iteam-label">Delete Confirmation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center d-block">
+                        <img src="~/images/warning-icon.svg" alt="warning" width="50px">
+                        <p>Are you sure you want to delete this iteam ?</p>
+                        <input name="ModifierID" type="hidden" id="DeleteModifierId">
+                        <input name="GroupId" type="hidden" id="DeleteModifierGroupId">
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="submit" class="btn btn-primary">Yes</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div id="EditModifierItem">
+
+    </div>
+
+<div class="modal fade" id="deleteMultipleTableModifer" tabindex="1" aria-labelledby="exampleModalLabel"
+    aria-hidden="false">
+    <form>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Confirmation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center d-block">
+                    <img src="~/images/warning-icon.svg" alt="warning" width="50px">
+                    <p>Are you sure you want to delete this iteam ?</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="submit" id="MassDeleteModifier" class="btn btn-primary">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div> *@
+
+    <script>
+
+    // main check box check if all checks are
+    function updateCheckAllState() {
+        let totalPermissions = $(".modiferitem").length;
+        let checkedPermissions = $(".modiferitem:checked").length;
+        $("#ModifierGroupId").prop("checked", totalPermissions === checkedPermissions);
+    }
+    $(".modiferitem").change(updateCheckAllState);
+
+    $('#ModifierGroupId').change(function () {
+        if ($(this).is(':checked')) {
+            $(".modiferitem").each(function () {
+                if ($(this).is(':checked')) {
+
+                } else {
+                    $(this).click();
+                }
+            });
+        } else {
+            $(".modiferitem").each(function () {
+                if ($(this).is(':checked')) {
+                    $(this).click();
+                }
+            });
+        }
+    });
+    // checkbs ends
+
+    $(document).ready(function () {
+        @* console.log("hello wrld"); *@
+        // Previous Page Click Handler
+        var url = "/Menu/ModifierTable";
+
+        let ModifierGroupId = $("#ModifierGroupId").data("id");
+        let currentPage = $("#previous_page_Modifer").data("currentpage");
+        @* console.log(currentPage); *@
+        let totalPages = $("#next_page_Modifer").data("totalpage");
+        @* console.log(totalPages); *@
+        let pagesize = $("#pagesizeModifer").data("size");
+
+        if (pagesize == 3) {
+            $('#Modopt3').attr('selected', 'selected');
+        } else if (pagesize == 5) {
+            $('#Modopt5').attr('selected', 'selected');
+        } else if (pagesize == 10) {
+            $('#Modopt10').attr('selected', 'selected');
+        } else if (pagesize == 15) {
+            $('#Modopt15').attr('selected', 'selected');
+        }
+
+
+
+        // Next Page Click Handler
+        if (currentPage < totalPages) {
+            $('.next_page_Modifer').on('click', function () {
+                currentPage++;
+                @* console.log('btn clicked---------nextpage'); *@
+                var url = $(this).data('url');
+                let data = { 'groupid': ModifierGroupId, 'page': currentPage, 'pagesize': pagesize , "search": $(".Modifier-search").first().val() };
+                @* console.log(url); *@
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: data,
+                    success: function (response) {
+                        $('#Menutable').html(response);
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                    }
+                });
+            });
+        }
+
+
+        $('.previous_page_Modifer').on('click', function () {
+            @* console.log("hello" + currentPage); *@
+            if (currentPage > 1) {
+                currentPage--;
+                @* console.log('btn clicked--------- previous_page'); *@
+                var url = $(this).data('url');
+                let data = { 'groupid': ModifierGroupId, 'page': currentPage, 'pagesize': pagesize,"search": $(".Modifier-search").first().val() };
+                @* console.log(url); *@
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: data,
+                    success: function (response) {
+                        $('#Menutable').html(response);
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+
+                    }
+                });
+            }
+        });
+
+
+
+        // Pagesize Dropdown Change Event
+        $('.pagesizeModifer').change(function () {
+            @* console.log("---------------------- pagesize") *@
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: { 'groupid': ModifierGroupId, "pagesize": $(this).val(), "search": $(".Modifier-search").first().val() },
+                success: function (response) {
+                    $('#Menutable').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        });
+
+        $('.Modifier-search').change(function () {
+            @* console.log("----------------------------- search",ModifierGroupId) *@
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: { 'groupid': ModifierGroupId, "pagesize": $(".pagesizeModifer").first().val(), "search": $(this).val() },
+                success: function (response) {
+                    $('#Menutable').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        });
+
+
+
+        
+        $("#MassDeleteModifier").click(function () {
+            let Modifierids = [];
+            $(".modiferitem").each(function () {
+                if ($(this).is(':checked')) {
+                    Modifierids.push($(this).data('id'));
+                }
+            });
+            @* console.log("ids==" + Modifierids); *@
+            let url = '@Url.Action("DeleteMultipleModifiers", "Menu")';
+            @* console.log({ "Modifierids": Modifierids }); *@
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: { "Modifierids": Modifierids, 'GroupId': ModifierGroupId },
+                success: function (response) {
+    @* location.reload() *@
+                        },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        });
+
+
+
+
+
+    });
+
+    $(document).on('click', '.DeleteModifier', function () {
+        @* console.log("--------------"); *@
+        var id = $(this).data("id");
+        let ModifierGroupId = '@Model.ModiferGroupId';
+
+        $('#DeleteModifierId').val(id);
+        $('#DeleteModifierGroupId').val(ModifierGroupId);
+        @* console.log($('#DeleteModifierId').val()); *@
+        @* console.log($('#DeleteModifierGroupId').val()); *@
+
+    });
+
+
+
+</script>

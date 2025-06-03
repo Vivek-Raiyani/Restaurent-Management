@@ -1,0 +1,64 @@
+@model pizzashop.data.ViewModels.Taxes.TaxesListVM
+
+<div class="modal fade" id="EditTax" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" >
+    <div class="modal-dialog  modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-primary"><strong>Edit Tax</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form  id="edittaxform">
+                <div class="modal-body ">
+                    <div class="form-floating mb-3">
+                        <input type="hidden" asp-for="TaxId">
+                        <input asp-for="TaxName" type="text" class="form-control" id="taxname" placeholder="Name*">
+                        <label asp-for="TaxName" for="taxname">Name*</label>
+                        <span asp-validation-for="TaxName" class="text-danger" id="taxnamevalidate"></span>
+                    </div>
+                    <div class="row">
+                        <div class="form-floating margintop col-lg-6 col-md-6">
+                            <select asp-for="TaxType" class="form-select" id="floatingSelect"
+                                aria-label="Floating label" value="1">
+                                <option selected>Tax Type</option>
+                                <option value="percentage">Percentage</option>
+                                <option value="fixed">Flat Amount</option>
+                            </select>
+                            <label asp-for="TaxType" for="floatingSelect" class="ms-3">Type*</label>
+                            <span asp-validation-for="TaxType" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating  col-lg-6 col-md-6">
+                            <input asp-for="TaxValue" type="text" class="form-control" id="TaxAmount"
+                                placeholder="UserName">
+                                <span class="text-danger" id="taxamountvalidate"></span>
+                            <span asp-validation-for="TaxType" class="text-danger" ></span>
+                            <label for="TaxAmount" class="ms-3">Tax Amount*</label>
+                        </div>
+                        <div class="d-flex gap-3 mt-2">
+                            <div class="form-check form-switch">
+                                <input asp-for="IsEnabled" class="form-check-input" type="checkbox" role="switch"
+                                    id="flexSwitchCheckDefault">
+                                <label asp-for="IsEnabled" class="form-check-label"
+                                    for="flexSwitchCheckDefault">isEnabled</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input asp-for="IsDefault" class="form-check-input" type="checkbox" role="switch"
+                                    id="flexSwitchCheckDefault1">
+                                <label asp-for="IsDefault" class="form-check-label"
+                                    for="flexSwitchCheckDefault1">Default</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-end">
+                    <button type="submit" class="btn btn-yes" id="addTax">Save</button>
+                    <button type="button" class="btn btn-no" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>

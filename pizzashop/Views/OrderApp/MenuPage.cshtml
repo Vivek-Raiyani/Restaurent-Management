@@ -1,0 +1,329 @@
+@model pizzashop.data.ViewModels.MenuCategories
+
+@{
+    ViewData["Title"] = "Order App";
+    Layout = "_orderappLayout";
+}
+
+<div class="row m-0">
+
+    <!-- sidebar-->
+    <div class="col-lg-2 bg-white">
+        <div id="navigation-list">
+            <ul class="p-4 nav nav-pills" style="list-style: none;" role="tablist" id="Menusidebar">
+                <li class=" gap-3 mt-4 w-100">
+                    <button class="nav-link  Menusidebarbtn w-100" data-bs-toggle="tab" data-id="-1">Favourite
+                        Items</button>
+                </li>
+                <li class="gap-3 mt-4 w-100">
+                    <button class="nav-link Menusidebarbtn w-100" data-bs-toggle="tab" data-id="0"> All </button>
+                </li>
+                @foreach (var category in Model.Cateogries)
+                {
+                    <li class="gap-3 mt-4 w-100">
+                        <button class="nav-link Menusidebarbtn w-100" data-bs-toggle="tab" data-id="@category.CategoryID">
+                            @category.CategoryName </button>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="w-100 btn mt-3">
+            <select id="navigation-select" class=" btn w-100 btn-outline-border-primary mb-4">
+                <option value=-1>Favourite Items</option>
+                <option value=0 selected>All</option>
+                @foreach (var category in Model.Cateogries)
+                {
+                    <option value="@category.CategoryID">@category.CategoryName</option>
+                }
+            </select>
+        </div>
+    </div>
+
+
+    <div class="col-lg-10" id="mainbody">
+        <div class="row m-0">
+            <div class="col-lg-6">
+                <div class=" d-flex m-4">
+                    <input class="btn me-2 form-control " type="search" placeholder="Search" name="search"
+                        id="orderappmenusearch" style="border: 1px solid black;height :50px" aria-label="Search">
+                    <label for="search" style="margin-left: -50px; margin-top: 10px;">
+                        <i class="bi bi-search"></i>
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="d-flex align-center justify-content-end m-4 gap-3">
+                    <div class="d-flex gap-3">
+                        <div class="rounded border border-success" style="height: 25px; width: 25px;">
+                                <div class="rounded-circle bg-success" style="height: 15px; width: 15px; margin: 4px;"></div>
+                            </div> Veg
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <div class="rounded border border-danger" style="height: 25px; width: 25px;">
+                            <div class="rounded-circle bg-danger" style="height: 15px; width: 15px; margin: 4px;"></div>
+                        </div> Non Veg
+                    </div>
+                    <div class="d-flex gap-3">
+                        <div class="rounded border border-warning" style="height: 25px; width: 25px;">
+                                <div class="rounded-circle bg-warning" style="height: 15px; width: 15px; margin: 4px;"></div>
+                            </div>
+                            Vegan
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row m-0">
+            @* conditional rending id order id the below *@
+
+            @* menu items display *@
+            <div class=@(Model.OrderId ==0 ? "col-12 " : "col-xl-6 ") id="itemdisplay">
+            </div>
+            @* order preview *@
+            <div class="col-xl-6  " @(Model.OrderId == 0 ? "hidden" : "")>
+                <div id="orderpreview" class="tile">
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+</div>
+
+<div id="helloworld"></div>
+
+@section Scripts {
+    <script>
+        let itemselected = {}; // for storing data to add inorder
+        let modifierselected = [];
+
+        function itemajaxcall(url, data) {
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: data,
+                success: function (response) {
+                    console.log(response);
+                    $("#itemdisplay").html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        }
+        // sidebar  and category select script 
+
+        $(document).on("click", ".Menusidebarbtn", function () {
+            console.log("category btn clikced with id= ", $(this).data("id"));
+            let url = "@Url.Action("MenuItems", "OrderMenu")";
+            let data = { "categoryid": $(this).data("id"), "search": $("#orderappmenusearch").val(), "orderid": @Model.OrderId};
+            console.log(data);
+            itemajaxcall(url = url, data = data);
+
+        });
+        // clicking on all btn
+        $(".Menusidebarbtn[data-id='0']").click();
+
+        $(document).on("change", "#navigation-select", function () {
+            console.log("category btn clikced with id= ", $(this).data("id"));
+            let url = "@Url.Action("MenuItems", "OrderMenu")";
+            let data = { "categoryid": $(this).val(), "search": $("#orderappmenusearch").val(), "orderid": @Model.OrderId};
+            console.log(data);
+            itemajaxcall(url = url, data = data);
+
+        });
+
+        // script end
+
+        // search script
+        $(document).on("change", "#orderappmenusearch", function () {
+            let url = "@Url.Action("MenuItems", "OrderMenu")";
+            let id = 0;
+            console.log($("#Menusidebar").is(':visible'))
+            if (!$("#Menusidebar").is(':visible')) {
+                id = parseInt($("#navigation-select").val());
+                console.log(id);
+            } else {
+                id = parseInt($(".active").data("id"));
+            }
+            let data = { "categoryid": id, "search": $("#orderappmenusearch").val(), "orderid": @Model.OrderId};
+            console.log(data);
+            itemajaxcall(url = url, data = data);
+        });
+
+        //add  item script
+        $(document).on("click", ".menuitems", function () {
+            let id = $(this).data("id");
+            let data = { "itemid": id };
+            itemselected = { "itemid": id, "name": $(`#menuitemname-${id}`).html(), "price": $(`#menuitemrate-${id}`).html(), "quantity": 1 };
+            console.log(itemselected);
+            let url = "@Url.Action("ItemModiferModal", "OrderMenu")";
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: data,
+                success: function (response) {
+        @* console.log(response); *@
+                        $("#helloworld").html(response);
+                    if ($(".modifier-for-item").length > 0) {
+                        console.log("model showing")
+                        $("#add-modifiers-modal").modal("show");
+                    }
+                    else {
+                        console.log("btn clicked--------------")
+                        $("#order-item-add-btn").click()
+                    }
+
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+
+        })
+
+        $(document).on("click", "#order-item-add-btn", function () {
+            let queryString = window.location.search;
+            queryString = queryString.slice(0, 8); // Output: "?param1=value1&param2=value2"?orderid=71
+            if (queryString != "?orderid") {
+                console.log("hello")
+            }
+            else {
+                // getting all selected modifiers
+                let modifercount = 0;
+                modifierselected = []
+                console.log($(".modifier-checkboxes:checked"));
+                // set of groupname 
+                let groupnameset = new Set();
+                $(".modifier-checkboxes").each(function () {
+                    groupnameset.add($(this).data("group"));
+                })
+                // converting set to list for easy access
+                let groupname = Array.from(groupnameset);
+
+                for (let i = 0; i < groupname.length; i++) {
+                    let min = parseInt($(`#Min-${groupname[i]}`).html());
+                    let max = parseInt($(`#Max-${groupname[i]}`).html());
+                    let modpergroup = $(`.modifier-checkboxes[data-group = ${groupname[i]}]:checked`);
+                    if (modpergroup.length > max || modpergroup.length < min) {
+                        toastr.error("no of selected modifier is not between " + min + " - " + max);
+                        return;
+                        // breaks from function and doesnt add item
+                    }
+                }
+
+
+
+                console.log("return not worked")
+                $(".modifier-checkboxes:checked").each(function () {
+                    let modifier = { "modifierid": $(this).data("id"), "name": $(this).data("name"), "price": $(this).data("rate") }
+                    modifierselected.push(modifier);
+                    modifercount++;
+                });
+
+                itemselected["modifiers"] = modifierselected;
+                let modifiertotal = 0;
+                // adding to order bill parital view
+
+                let itemcard = `
+                                                        <div class=" row m-0 new-item orderpreviewitem" data-itemid="${itemselected.itemid}" data-modifiercount="${modifercount}">
+                                                        <div class="col-1"> 
+                                                        <button class="accordion-button p-0" type="button" data-bs-toggle="collapse"
+                                                            data-bs-target="#collapse-${itemselected.name}-${modifercount}" aria-expanded="false" aria-controls="collapseOne${itemselected.name}">
+                                                        </button>
+                                                        </div>
+                                                        <div class="col-4">
+                                                        <div class="d-flex gap-3">
+
+                                                            <div class=" w-100">${itemselected.name}</div>
+
+                                                    </div>
+                                                    <div id="collapse-${itemselected.name}-${modifercount}" class="accordion-collapse collapse "
+                                                                        data-bs-parent="#accordionExample">
+                                                                        <div class="accordion-body p-0" >
+                                                                            <ul class="p-0 m-0">`
+                modifierselected.forEach(function (modifier) {
+                    itemcard += `
+                                                                        <li class="d-flex justify-content-between modifiers-0-${itemselected.itemid}-${modifercount}" data-id="${modifier.modifierid}"> 
+                                                                            <p class="m-0">${modifier.name}</p>
+                                                                            <p class="m-0">${modifier.price}</p>
+                                                                        </li>
+                                                                        `
+                    modifiertotal += modifier.price
+                });
+                itemcard += `</ul>
+                                                                        </div>
+                                                                    </div>
+                                                    </div>
+                                                    <div class="col-3">
+                                                        <div class="btn btn-outline-border-primary p-0">
+                                                            <div class="row m-0 p-2 ">
+                                                                <div class="col-4 subtractbtn " data-id="0-${itemselected.itemid}-${modifercount}">
+                                                                    <button class="btn text-primary p-0"><strong>-</strong></button>
+                                                                </div>
+                                                                <div class="col-4 kotitemquantity text-center m-auto">
+                                                                    <span id="itemcount" hidden>${itemselected.quantity}</span>
+                                                                    <span id="quantity-0-${itemselected.itemid}-${modifercount}">${itemselected.quantity}</span>
+                                                                </div>
+                                                                <div class="col-4 addbtn" data-id="0-${itemselected.itemid}-${modifercount}">
+                                                                    <button class="btn text-primary p-0"><strong>+</strong></button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-2">
+                                                        <p class="m-0" id="itemprice-0-${itemselected.itemid}-${modifercount}" data-rate="${itemselected.price}">${itemselected.price}</p>
+                                                        <p class="m-0" id="modifierprice-0-${itemselected.itemid}-${modifercount}" data-rate="${modifiertotal}">${modifiertotal}</p>
+                                                    </div>
+                                                    <div class="col-2">
+                                                        <button class="btn btn-outline-border-primary text-primary deleteorderitem"><i class="bi bi-trash"></i></button>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                `;
+
+                toastr.success("item added")
+                $("#orderitemdisplay").append(itemcard);
+                calSubtotal();
+            }
+        });
+        // script end
+
+        // fetch order details script
+        if (@Model.OrderId > 0) {
+            let url = "@Url.Action("OrderDetails", "OrderMenu")";
+            data = { "orderid": @Model.OrderId};
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: data,
+                success: function (response) {
+                    $("#orderpreview").html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        }
+
+        function orderchanges(url, data) {
+            console.log("order change func called");
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    $("#orderpreview").html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        }
+
+    </script>
+}

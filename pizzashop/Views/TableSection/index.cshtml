@@ -1,0 +1,472 @@
+@model IEnumerable<pizzashop.data.ViewModels.TableSection.SectionSidebarVM>
+
+@{
+    ViewData["Title"] = "Table&Sections";
+    Layout = "_adminlayout";
+}
+
+<div class="container m-auto mt-5">
+
+    <h2 class="mb-5 text-primary"><strong>Sections/Tables</strong></h2>
+
+    <div class="container p-0">
+        <div class="tile">
+            
+            <div class="row gx-3 gx-lg-5 m-0">
+            <!-- modifier sidebar -->
+            <div class="col-lg-3 pt-4 ">
+                <div class="row p-0">
+                    <div class=" col-sm-4 col-lg-12 d-flex justify-content-around mb-4" >
+                    <p class="m-0 btn text-primary"><strong>Sections</strong></p>
+                    <button type="button" class="btn addnewsectionbtn " >
+                        <i class="bi bi-plus-square-fill"></i>
+                    </button>
+                </div>
+                @* select dd *@
+                <div class=" col-sm-8 d-flex justify-content-around btn  ">
+        <div class="row w-100" id="navigation-select">
+            <div class="col-8">
+                <select class=" btn w-100 btn-outline-border-primary mb-4 navigation-list-section">
+                    @foreach (var floor in @Model)
+                            {
+                                <option value="@floor.SectionId">@floor.SectionName</option>
+                            }
+                </select>
+            </div>
+            <div class="col-4">
+                <div class="d-flex gap-1">
+                    <button id="SelectedEditSection" class=" btn btn-outline-border-primary text-primary">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+
+                    <button id="SelectedDeleteSection" class=" btn btn-outline-border-primary text-primary">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>  
+            </div>
+                <div id="navigation-list" class="sidebarscroll mb-5">
+                    @* full screen *@
+                    <ul  class="nav nav-pills nav-tabs-vertical"  style="max-height: 350px; overflow-y: auto;" role="tablist">
+                        @foreach (var floor in @Model)
+                        {
+                            <li class="nav-item vertical-tab-btn mb-2 SectionBtn d-flex justify-content-between w-100" role="presentation" data-id="@floor.SectionId"
+                                id="@floor.SectionName"
+data-url="@Url.Action("GetSectionTables", "TableSection", new { SectionId = floor.SectionId })">
+                                <!--- target id dynamic -->
+                                <a class="nav-link width-100" data-bs-toggle="tab" 
+                                    role="tab" aria-selected="true">
+                                    <div class="d-flex  justify-content-between">
+                                        <div class="d-flex ">
+                                            <p class="m-auto"><i class="bi bi-three-dots-vertical"></i></p>
+                                            <p class="m-auto"><small>@floor.SectionName</small></p>
+                                        </div>
+                                    </div>
+                                </a>
+
+                                <div class="d-flex text-end">
+                                            <button class=" btn menu-sidebar-btn EditSectionClass"
+                                             data-id="@floor.SectionId" data-name="@floor.SectionName" data-desc="@floor.Description">
+                                             <i class="bi bi-pencil"></i></button>
+
+                                            <button class="btn menu-sidebar-btn DeleteSectionClass" data-id="@floor.SectionId" ><i
+                                                    class="bi bi-trash"></i></button>
+                                        </div>
+                            </li>
+                        }
+
+                    </ul>
+                </div>
+            </div>
+
+            <!-- modifier content -->
+            <div class="col-lg-9">
+                <div id="SectionTablePV" >
+                    
+                </div>
+            </div>
+        </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="AddNewSectionModal"></div>
+
+<div id="EditNewSectionModal"></div>
+              
+@*  remove form *@
+<!-- Modal delete category -->
+<div class="modal fade" id="DeleteSectionModal" tabindex="1" aria-labelledby="exampleModalLabel">
+    
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Confirmation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center d-block">
+                    <img src="~/images/warning-icon.svg" alt="warning" width="50px">
+                    <p>Are you sure you want to delete this iteam ?</p>
+                    <input name="SectionId" type="hidden" id="DeleteSection">
+                </div>
+                <div class="modal-footer justify-content-center">
+                    @* need to be added dynamically *@
+                    <button type="submit" id="section-delete" class="btn btn-primary" data-bs-dismiss="modal">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    
+</div>
+
+
+@section Scripts {
+    <script>
+        
+        $(document).on("click",".EditSectionClass", function(){
+            let url = '/TableSection/UpdateSection' ;
+            console.log($(this).data("id"));
+            $.ajax({
+                        url: url,
+                        type: "GET",
+                        data: {"SectionId":$(this).data("id")},
+                        success: function (response) {
+                            console.log("---response--")
+                            $('#EditNewSectionModal').html(response);
+                            $("#EditSection").modal("show");
+                        },
+                        error: function (request, status, error) {
+                            alert(request.responseText);
+                        }
+                    });
+           
+            
+            @* console.log(); *@
+        });
+
+        $(document).on("click","#SelectedEditSection", function(){
+            let url = '/TableSection/UpdateSection' ;
+            console.log($(".navigation-list-section").val());
+            $.ajax({
+                        url: url,
+                        type: "GET",
+                        data: {"SectionId":$(".navigation-list-section").val()},
+                        success: function (response) {
+                            console.log("---response--")
+                            $('#EditNewSectionModal').html(response);
+                            $("#EditSection").modal("show");
+                        },
+                        error: function (request, status, error) {
+                            alert(request.responseText);
+                        }
+                    });
+           
+            
+            @* console.log(); *@
+        });
+
+
+        $(document).on("click",".addnewsectionbtn", function(){
+            let url = '/TableSection/AddNewSection' ;
+            $.ajax({
+                        url: url,
+                        type: "GET",
+                        success: function (response) {
+                            console.log("---response--")
+                            $('#AddNewSectionModal').html(response);
+                            $("#AddNewSection").modal("show");
+                        },
+                        error: function (request, status, error) {
+                            alert(request.responseText);
+                        }
+                    });
+           
+            
+            @* console.log(); *@
+        });
+        
+        $(document).on("click",".DeleteSectionClass", function(){
+            $("#DeleteSection").val(parseInt($(this).data("id")));
+            $("#DeleteSectionModal").modal("show");
+        });
+        $(document).on("click","#SelectedDeleteSection", function(){
+            $("#DeleteSection").val(parseInt($('.navigation-list-section').val()));
+            $("#DeleteSectionModal").modal("show");
+        });
+
+        $(document).on("click","#section-delete", function(){
+                $.ajax({
+                        url: '/TableSection/DeleteSection',
+                        type: "DELETE",
+                        contentType: "application/json",
+                    dataType: "json",
+                        data: { "SectionId": $("#DeleteSection").val()},
+                        success: function (response) {
+                            console.log(response);
+                            if(response.succes)
+                            {
+                                toastr.success(response.message);
+                            }
+                            else{
+                                toastr.error(response.message);
+                            }
+                            
+                        },
+                        error: function (request, status, error) {
+                           toastr.error(request.responseJSON.error)
+                            console.log(request.responseText)
+                        }
+                    });
+        });
+
+        // get item when category is clicked
+        let SectionBtn = $(".SectionBtn");
+            SectionBtn.each(function () {
+
+                $(this).on('click', function () {
+                    console.log('btn clicked');
+                    var id = $(this).data('id');
+                    var url = $(this).data('url');
+                    console.log(url);
+                    $.ajax({
+                        url: url,
+                        type: "GET",
+                        success: function (response) {
+                            $('#SectionTablePV').html(response);
+                        },
+                        error: function (request, status, error) {
+                            alert(request.responseText);
+                            console.log(request.responseText)
+                        }
+                    });
+
+                });
+            });
+
+            $(".navigation-list-section").on('change', function () {
+               
+                    var id = $(this).val();
+                    var url = "/TableSection/GetSectionTables"
+                    console.log(url);
+                     console.log(id)
+                    $.ajax({
+                        url: url,
+                        type: "GET",
+                        data : {"SectionId" : id},
+                        success: function (response) {
+                            $('#SectionTablePV').html(response);
+                        },
+                        error: function (request, status, error) {
+                            alert(request.responseText);
+                            console.log(request.responseText)
+                        }
+                    });
+                });
+
+
+        $(".SectionBtn:first").click();
+        $(".SectionBtn:first").children("a:first-child").addClass("active");
+
+        $("#navigation-select").change(function(){
+                    var url = "/TableSection/GetSectionTables";
+                    console.log(url);
+                    $.ajax({
+                        url: url,
+                        type: "GET",
+                        data: {"SectionId": $(".navigation-list-category").val()},
+                        success: function (response) {
+                            $('#SectionTablePV').html(response);
+                        },
+                        error: function (request, status, error) {
+                            alert(request.responseText);
+                            console.log(request.responseText)
+                        }
+                    });
+        });
+
+        $(document).on("click","#AddSectionTable",function(){
+            let url = '/TableSection/NewAddTable' ;
+            console.log(url);
+            $.ajax({
+                        url: url,
+                        type: "GET",
+                        success: function (response) {
+                            console.log("---response--")
+                            $('#AddEditTable').html(response);
+                            $("#AddTableModal").modal("show")
+                        },
+                        error: function (request, status, error) {
+                            alert(request.responseText);
+                        }
+                    });
+        }); 
+
+        $(document).on("click",".EdittableId",function(){
+            let url = '/TableSection/UpdateTable' ;
+            console.log(url);
+            $.ajax({
+                        url: url,
+                        type: "GET",
+                        data: {"tableId":$(this).data("id")},
+                        success: function (response) {
+                            console.log("---response--")
+                            $('#AddEditTable').html(response);
+                            $("#AddTableModal").modal("show")
+                        },
+                        error: function (request, status, error) {
+                            alert(request.responseText);
+                        }
+                    });
+        });
+
+        $(document).on("click",".deletetableid",function(){
+            $("#DeleteTable").val($(this).data("id"));
+        });
+
+        function DataSubmitTable(url, data = {}, sectionid) {
+                console.log(data)
+                console.log(sectionid);
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    processData : false,
+                    contentType: false ,
+                    data: data,
+                    success: function (response) {
+                        console.log(response);
+
+                        if(response.succes)
+                        {
+                            toastr.success(response.message);
+                        }
+                        else{
+                            toastr.error(response.message);
+                        }
+
+
+                        if(sectionid>0){
+                            console.log("called");
+                           var url = $(".active").parent(".nav-item").data("url");
+                            console.log(url);
+                            $.ajax({
+                                url: url,
+                                type: "GET",
+                                success: function (response) {
+                                    $('#SectionTablePV').html(response);
+                                },
+                                error: function (request, status, error) {
+                                    alert(request.responseText);
+                                    console.log(request.responseText)
+                                }
+                            });
+                        }
+                    },
+                    error: function (request, status, error) {
+                        @* alert(request.responseText); *@
+                        console.log(request)
+                        toastr.error(request.responseJSON.error)
+                    }
+                });
+            }
+
+
+        function DataSubmit(url, data = {}) {
+                console.log(data)
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    processData : false,
+                    contentType: false ,
+                    data: data,
+                    success: function (response) {
+                        console.log(response);
+                            if(response.succes)
+                            {
+                                toastr.success(response.message);
+                            }
+                            else{
+                                toastr.error(response.message);
+                            }
+
+                    },
+                    error: function (request, status, error) {
+                        @* alert(request.responseText); *@
+                        console.log(request)
+                        toastr.error(request.responseJSON.error)
+                    }
+                });
+            }
+
+            // add sction call
+            $(document).on("submit", "#addsectionform", function () {
+                event.preventDefault(); 
+                console.log("section submitting");
+                let url = "/TableSection/AddNewSection";
+                let form = $("#addsectionform");
+                let data = new FormData(form[0]);
+                @* data["SectionId"] = 0; *@
+                for (const pair of data.entries()) {
+                    console.log(pair[0], pair[1]);
+                }
+                DataSubmit(url = url, data = data);
+                $("#AddNewSection").modal('hide');
+            })
+
+            // add table form
+            $(document).on("submit", "#addtableform", function () {
+                event.preventDefault(); 
+                console.log("section submitting");
+                let url = "/TableSection/NewAddTable";
+                let form = $("#addtableform");
+                let data = new FormData(form[0]);
+                for (const pair of data.entries()) {
+                    console.log(pair[0], pair[1]);
+                }
+
+                let seleted = $(".active").parent().data("id");
+                console.log(seleted);
+                if (seleted == undefined || seleted == NaN) {
+                    seleted = 0;
+                }
+                DataSubmitTable(url = url, data = data, sectionid= seleted);
+                $("#AddTableModal").modal('hide');
+            })
+
+            $(document).on("submit", "#edittableform", function () {
+                event.preventDefault(); 
+                console.log("section submitting");
+                let url = "/TableSection/UpdateTable";
+                let form = $("#edittableform");
+                let data = new FormData(form[0]);
+                for (const pair of data.entries()) {
+                    console.log(pair[0], pair[1]);
+                }
+                let seleted = $(".active").parent().data("id");
+                console.log(seleted);
+                if (seleted == undefined || seleted == NaN) {
+                    seleted = 0;
+                }
+                DataSubmitTable(url = url, data = data,sectionid = seleted);
+                $("#AddTableModal").modal('hide');
+            })
+
+            $(document).on("submit", "#editsectionform", function () {
+                event.preventDefault(); 
+                console.log("section submitting");
+                let url = "/TableSection/UpdateSection";
+                let form = $("#editsectionform");
+                let data = new FormData(form[0]);
+                for (const pair of data.entries()) {
+                    console.log(pair[0], pair[1]);
+                }
+                DataSubmit(url = url, data = data);
+                $("#EditSection").modal('hide');
+            })
+
+
+    </script>
+}

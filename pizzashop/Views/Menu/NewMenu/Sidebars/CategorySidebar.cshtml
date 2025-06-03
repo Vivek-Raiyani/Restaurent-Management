@@ -1,0 +1,68 @@
+@model IEnumerable<pizzashop.data.ViewModels.CategoryVM>
+
+<div class="row p-0">
+    <!-- iteam sidebar head -->
+    <div class="  col-sm-4 col-lg-12 d-flex justify-content-between p-auto mb-4 m-auto">
+        <p class="m-0 btn text-primary"><strong>Category</strong></p>
+        <button type="button" class="btn p-0" id="addcategory">
+            <i class="bi bi-plus-square"></i>
+        </button>
+    </div>
+    @* select dd *@
+    <div class=" col-sm-8 d-flex justify-content-around btn  ">
+        <div class="row w-100" id="navigation-select">
+            <div class="col-8">
+                <select class=" btn w-100 btn-outline-border-primary mb-4 navigation-list-category">
+                    @foreach (var category in Model)
+                    {
+                        <option value="@category.CategoryID">@category.CategoryName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-4">
+                <div class="d-flex gap-1">
+                    <button id="SelectedEditCategory" class=" btn btn-outline-border-primary text-primary">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+
+                    <button id="SelectedDeleteCategory" class=" btn btn-outline-border-primary text-primary"
+                        data-bs-toggle="modal" data-bs-target="#SingleDeleteModal">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- iteam sidebar list -->
+    <div id="navigation-list" class="sidebarscroll mb-5">
+        <ul class="nav nav-pills nav-tabs-vertical mb-5 " role="tablist">
+            @foreach (var category in Model)
+            {
+                @* need to give each btn class for ajax call *@
+                <li class="categorybtn  nav-item vertical-tab-btn mb-2  d-flex justify-content-between" role="presentation"
+                    data-id="@category.CategoryID">
+                    <a class="nav-link" id="vertical-tabpanel-1 " data-bs-toggle="tab" href="#vertical-tabpanel-1"
+                        role="tab" aria-controls="vertical-tabpanel-1" aria-selected="true">
+                        <div class="d-flex  justify-content-between">
+                            <div class="d-flex ">
+                                <p class="m-auto"><i class="bi bi-three-dots-vertical"></i></p>
+                                <p class="m-auto">@category.CategoryName</p>
+                            </div>
+                            @* model buttons *@
+                            <div class="d-flex">
+                                <button class=" btn menu-sidebar-btn editcategorymodel" data-bs-toggle="modal"
+                                    data-bs-target="#edit-category" data-id="@category.CategoryID">
+                                    <i class="bi bi-pencil"></i></button>
+
+                                <button class="btn menu-sidebar-btn delcategory" data-bs-toggle="modal"
+                                    data-bs-target="#SingleDeleteModal" data-id="@category.CategoryID"
+                                    data-name="category"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </div>
+                    </a>
+
+                </li>
+            }
+        </ul>
+    </div>
+</div>

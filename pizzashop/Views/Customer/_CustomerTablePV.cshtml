@@ -1,0 +1,160 @@
+@model pizzashop.data.ViewModels.PaginatedListVM<pizzashop.data.ViewModels.CustomerVM.CustomerTableVM>
+
+
+<div class="tile">
+    <div class="table-responsive p-4">
+        <table class="table">
+            <thead>
+                <tr>
+
+                    <th class="text-center align-content-center">
+                        Name
+                        <i class="bi bi-arrow-down" data-name="name"></i>
+                        <i class="bi bi-arrow-up" data-name="name"></i>
+                    </th>
+                    <th class="text-center align-content-center">Email</th>
+                    <th class="text-center align-content-center">Phone Number</th>
+                    <th class="text-center align-content-center">
+                        Date
+                        <i class="bi bi-arrow-down" data-name="date"></i>
+                        <i class="bi bi-arrow-up" data-name="date"></i>
+                    </th>
+                    <th class="text-center align-content-center">
+                        TotalOrder
+                        <i class="bi bi-arrow-down" data-name="orders"></i>
+                        <i class="bi bi-arrow-up" data-name="orders"></i>
+                    </th>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model?.Items != null && Model.Items.Any())
+                {
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr class="CustomerRow text-center align-content-center" data-id="@item.CustomerId">
+                            <td class=" text-center align-content-center">@item.Name</td>
+                            <td class=" text-center align-content-center">@item.Email</td>
+                            <td class=" text-center align-content-center">@item.PhoneNo</td>
+                            <td class=" text-center align-content-center">@item.CreatedOn.ToShortDateString()</td>
+                            <td class="text-center align-content-center">@item.TotalOrders</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center">No records found</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+
+    </div>
+
+    <div aria-label="Page navigation example">
+        <ul class="pagination justify-content-end text-center ">
+            <li class="page-item m-1">
+                <small>User per page</small>
+                @* <input type="text" value="@Model.Search" hidden> *@
+                <small>
+                    <select name="pagesize" id="customerpagesize" data-value="@Model.PageSize">
+                    <option asp-route-pagesize=3 id="opt3">3</option>
+                    <option asp-route-pagesize=5 id="opt5">5</option>
+                    <option asp-route-pagesize=10 id="opt10">10</option>
+                    <option asp-route-pagesize=15 id=opt15>15</option>
+                </select>
+                </small>
+            </li>
+            <li class=" page-item m-1">
+                <small>Showing <span>@((Model.PageIndex - 1) * Model.PageSize + 1)</span> -
+                <span>@((Model.PageIndex * Model.PageSize) > Model.TotalItems ? Model.TotalItems
+                      : (Model.PageIndex * Model.PageSize))</span>of
+                <span>@Model.TotalItems</span></small>
+                <span id="customercurrentpage" hidden>@Model.PageIndex</span>
+                <span id="customertotalpage" hidden>@Model.TotalPages</span>
+
+            </li>
+
+            <!-- Previous Button -->
+            <li class="page-item m-1">
+
+                <small class="page-link" aria-label="Previous" id="customer_previous_page">
+                    <span aria-hidden="true">&laquo;</span>
+                </small>
+            </li>
+            <li class="page-item m-1">
+                <small class="page-link" aria-label="Next" id="customer_next_page">
+                    <span aria-hidden="true">&raquo;</span>
+                </small>
+            </li>
+        </ul>
+    </div>
+</div>
+<script>
+
+
+    $(document).ready(function () {
+
+        let opt_value = $("#customerpagesize").data("value");
+        if (opt_value == 3) {
+            $('#opt3').attr('selected', 'selected');
+        } else if (opt_value == 5) {
+            $('#opt5').attr('selected', 'selected');
+        } else if (opt_value == 10) {
+            $('#opt10').attr('selected', 'selected');
+        } else if (opt_value == 15) {
+            $('#opt15').attr('selected', 'selected');
+        }
+
+        let sortbit = 0;
+        const url = '/Customer/GetCustomerTable';
+        $(".bi-arrow-down").on("click", function () {
+            console.log("------------------------------")
+            let sortname = $(this).data("name");
+            sortbit = 1;
+
+
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: {
+                        "pageIndex": 1, "pageSize": $("#customerpagesize").val(), 'sortname': sortname, 'sorttype': 'desc', 'sortbit': sortbit
+                    },
+                    success: function (response) {
+                        $('#CustomerTable').html(response);
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                        console.log(request.responseText)
+                    }
+                })
+        });
+
+
+        $(".bi-arrow-up").on("click", function () {
+            let sortname = $(this).data("name");
+            sortbit = 1;
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: {
+                    "pageIndex": 1, "pageSize": $("#customerpagesize").val(), 'sortname': sortname, 'sorttype': 'asc', 'sortbit': sortbit
+                },
+                success: function (response) {
+                    $('#CustomerTable').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                    console.log(request.responseText)
+                }
+            })
+        });
+
+
+
+
+    });
+
+</script>

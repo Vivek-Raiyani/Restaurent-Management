@@ -1,0 +1,73 @@
+@model pizzashop.data.ViewModels.TableSection.AddEditTableVM;
+
+<div class="modal modal-dialog-scrollable fade" id="AddTableModal" data-bs-backdrop="static"  data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel">
+    <div class="modal-dialog  modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-primary"><strong>Add Table</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+<form  id="addtableform">
+                <div class="modal-body">
+                    <div class="row">
+        
+                        <!-- Floor Selection -->
+                        <div class="form-floating margintop col-lg-6 col-md-6">
+                            <select asp-for="SectionId" class="form-select" id="floatingSelect"
+                                aria-label="Floating label">
+                                <option value="0">Select Section</option>
+                                @* @foreach (var Table in ViewBag.sections)
+                                {
+                                    <option value="@Table.Value">@Table.Text</option>
+                                } *@
+                                @foreach(var floor in @Model.Sections){
+                                    <option value="@floor.SectionId">@floor.SectionName</option>
+                                }
+                            </select>
+                            <label asp-for="SectionId" for="floatingSelect" class="ms-3">Sections*</label>
+                            <span class="text-danger" asp-validation-for="SectionId"></span>
+                        </div>
+
+                        <!-- Table Name -->
+                        <div class="form-floating margintop col-lg-6 col-md-6">
+                            <input asp-for="TableName" type="text" class="form-control" id="tablename"
+                                placeholder="Table Name" value="@Model.TableName">
+                            <label asp-for="TableName" for="tablename" class="ms-3">Table Name*</label>
+                            <span class="text-danger"  id="tablenamevalidate"></span>
+                            <span class="text-danger" asp-validation-for="TableName"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <!-- Capacity -->
+                        <div class="form-floating margintop col-lg-6 col-md-6">
+                            <input asp-for="Capacity"  class="form-control" id="floatingInput"
+                                placeholder="Capacity">
+                            <label asp-for="Capacity" for="floatingInput" class="ms-3">Capacity</label>
+                            <span class="text-danger" asp-validation-for="Capacity"></span>
+                        </div>
+
+                        <!-- Availability -->
+                        <div class="form-floating margintop col-lg-6 col-md-6">
+                            <select asp-for="Status" class="form-select" id="floatingSelect"
+                                aria-label="Floating label">
+                                <option value="available">Available</option>
+                            </select>
+                            <label asp-for="Status" for="floatingSelect" class="ms-3">Status*</label>
+                            <span class="text-danger" asp-validation-for="Status"></span>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button type="submit" class="btn btn-yes">Save</button>
+                        <button type="button" class="btn btn-no" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>

@@ -1,0 +1,51 @@
+@model pizzashop.data.ViewModels.MenuCustomerDetail
+
+<div class="modal fade" id="customer-details" tabindex="-1" >
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-primary"><strong> Customer Details </strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body ">
+                <!-- Floor Selection -->
+                <div class="row m-0">
+
+
+                    <div class="form-floating margintop col-12">
+                        <input type="text" class="form-control" id="floatingInput" asp-for="Name"
+                            placeholder="Table Name" value="@Model.Name">
+                        <label for="floatingInput" class="ms-3">Name*</label>
+                        <span class="text-danger" asp-validation-for="Name"></span>
+                    </div>
+
+                    <!-- Table Name -->
+                    <div class="form-floating margintop col-lg-6">
+                        <input type="text" class="form-control" id="floatingInput" asp-for="Phone"
+                            placeholder="Table Name" value="@Model.Phone">
+                        <label for="floatingInput" class="ms-3">Mobile Number*</label>
+                        <span class="text-danger" asp-validation-for="Phone"></span>
+                    </div>
+
+                    <!-- Capacity -->
+                    <div class="form-floating margintop col-lg-6">
+                        <input class="form-control" id="floatingInput" placeholder="Capacity" asp-for="Persons"
+                            value="@Model.Persons">
+                        <label for="floatingInput" class="ms-3">No of Person(s)*</label>
+                        <span class="text-danger" asp-validation-for="Persons"></span>
+                    </div>
+
+                    <div class="form-floating margintop col-12">
+                        <input type="text" class="form-control" id="floatingInput" asp-for="Email"
+                            placeholder="Table Name" value="@Model.Email">
+                        <label for="floatingInput" class="ms-3">Email*</label>
+                        <span class="text-danger" asp-validation-for="Email"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="submit" data-id=0 class="btn btn-outline-primary" data-bs-dismiss="modal">Done</button>
+            </div>
+        </div>
+    </div>
+</div>

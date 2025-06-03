@@ -1,0 +1,366 @@
+@using System.Security.Claims
+@model pizzashop.data.ViewModels.DashboardVM
+
+@{
+    var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+}
+
+<div class="row m-0 gx-4 gy-4">
+    <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="tile border rounded">
+            <div class="w-100">
+                <p class="text-end">
+                    @* <img src="" alt="icon" class="object-fit-cover" height="30px" width="30px"> *@
+                    <i class="bi bi-bar-chart"></i>
+                </p>
+            </div>
+            <div>
+                <h3 id="totalsales">@Model.TotalSales</h3>
+                <p>Total Sales</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="tile border rounded">
+            <div class="w-100">
+                <p class="text-end">
+                    @* <img src="" alt="icon" class="object-fit-cover" height="30px" width="30px"> *@
+                    <i class="bi bi-journal-check"></i>
+                </p>
+            </div>
+            <div>
+                <h3 id="totalorders">@Model.OrderCount</h3>
+                <p>Total Orders</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 col-sm-6">
+        <div class="tile border rounded">
+            <div class="w-100">
+                <p class="text-end">
+                    @* <img src="" alt="icon" class="object-fit-cover" height="30px" width="30px"> *@
+                    <i class="bi bi-receipt"></i>
+                </p>
+            </div>
+            <div>
+                <h3 id="avgorder">@Model.AvgOrderValue</h3>
+                <p>Avg Order Value</p>
+            </div>
+        </div>
+    </div>
+
+    <div class=" col-lg-3 col-md-6 col-sm-6">
+        <div class="tile border rounded">
+            <div class="w-100">
+                <p class="text-end">
+                    @* <img src="" alt="icon" class="object-fit-cover" height="30px" width="30px"> *@
+                    <i class="bi bi-stopwatch"></i>
+                </p>
+            </div>
+            <div>
+                <h3 id="waittime">@Model.AvgOrderWait</h3>
+                <p>Avg Waiting time</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row m-0 gx-4 gy-4">
+    <div class=" col-md-6 ">
+        <div class="tile border rounded">
+            <div class="w-100">
+                <h5>
+                    Revenue
+                </h5>
+            </div>
+            <div>
+                <canvas id="Revenue-chart" style="width:100%;max-width:700px"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class=" col-md-6">
+        <div class="tile border rounded">
+            <div class="w-100">
+                <h5>
+                    Customer Growth
+                </h5>
+            </div>
+            <div>
+                <canvas id="Customer-chart" style="width:100%;max-width:700px"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="row m-0 gx-4 gy-4">
+    <div class=@(role !="Admin" ?"col-lg-4 col-md-6 col-sm-6)" : "col-lg-3 col-md-6 col-sm-6")>
+        <div class="tile border rounded h-100">
+            <div class="w-100">
+                <p class="text-end">
+                <h5>
+                    Top Selling Items
+                </h5>
+                </p>
+            </div>
+            <div id="topsellingitemdiv" class="mb-2" style="max-height: 200px; overflow:auto;">
+                @* dynamic via js *@
+                @for (var i = 0; i < Model.TopSellingItem.Count; i++)
+                {
+                    var item = Model.TopSellingItem[i];
+                    <hr>
+                    <div class="d-flex gap-3">
+                        <p>#@(i+1)</p>
+                        @if (string.IsNullOrEmpty(@item.Img))
+                        {
+                            <img alt="img" class="rounded-circle " src="../images/dining-menu.png" width="50px" height="50px">
+                        }
+                        else
+                        {
+                            <img src="@item.Img" alt="itemimg" height="50px" width="50px" id="top-img-@i">
+                        }
+                        
+                        <div>
+                            <p id="top-name-@i">
+                                @item.Name
+                            </p>
+                            <div class="d-flex">
+                                <i class="bi bi-cup-hot"></i>
+                                <p id="top-order-@i">@item.OrderCount</p>
+                                <p>Orders</p>
+
+                            </div>
+                        </div>
+                    </div>
+
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class=@(role !="Admin" ?"col-lg-4 col-md-6 col-sm-6)" : "col-lg-3 col-md-6 col-sm-6")>
+        <div class="tile border rounded h-100">
+            <div class="w-100">
+                <p class="text-end">
+                <h5>
+                    Least Selling Items
+                </h5>
+                </p>
+            </div>
+            <div id="leastsellingitemdiv" class="mb-2" style="max-height: 200px; overflow:auto;">
+                @for (var i = 0; i < Model.LeastSellingItem.Count; i++)
+                {
+                    var item = Model.LeastSellingItem[i];
+                     <hr>
+                    <div class="d-flex gap-3">
+                        <p>#@(i + 1)</p>
+                        @if (string.IsNullOrEmpty(@item.Img))
+                        {
+                            <img alt="img" class="rounded-circle " src="../images/dining-menu.png" width="50px" height="50px">
+                        }
+                        else
+                        {
+                            <img src="@item.Img" alt="itemimg" height="50px" width="50px" id="least-img-@i">
+                        }
+                        
+                        <div>
+                            <p id="least-name-@i">
+                                @item.Name
+                            </p>
+                            <div class="d-flex">
+                                <i class="bi bi-cup-hot"></i>
+                                <p id="least-order-@i">@item.OrderCount</p>
+                                <p>Orders</p>
+
+                            </div>
+                        </div>
+                    </div>
+                   
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class=@(role !="Admin" ?"col-lg-4 col-md-6 col-sm-6)" : "col-lg-3 col-md-6 col-sm-6")>
+        <div class="tile border rounded h-100">
+            <div class="w-100">
+                <p class="text-end">
+                    @* <img src="" alt="icon" class="object-fit-cover" height="30px" width="30px"> *@
+                    <i class="bi bi-hourglass"></i>
+                </p>
+            </div>
+            <div>
+                <h3 id="WaitingListCount"></h3>
+                <small>Waiting List Count</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 col-sm-6)" @(role != "Admin" ? "hidden" : "")>
+        <div class="tile border rounded h-100">
+            <div class="w-100">
+                <p class="text-end">
+                    @* <img src="" alt="icon" class="object-fit-cover" height="30px" width="30px"> *@
+                    <i class="bi bi-person-fill"></i>
+                </p>
+            </div>
+            <div>
+                <h3 id="newcustomer">@Model.NewCustomerCount</h3>
+                <small>New Customer Count</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+
+    <script>
+        function makeChartdynamic(canvasid, xValues, yValues) {
+            new Chart(canvasid, {
+                type: "line",
+                data: {
+                    labels: xValues,
+                    datasets: [{
+                        fill: true,
+                        backgroundColor: "rgba(0,102,171,.7)",
+                        borderColor: "rgba(0,0,255,0.1)",
+                        data: yValues
+                    }]
+                },
+                options: {
+                    legend: { display: false },
+                    scales: {
+                        yAxes: [{ ticks: { min: 0 } }],
+                    }
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            const url = '/Admin/DashboardChart';
+            console.log({ "days": $("#Dashboard-select").val() })
+
+            $.ajax({
+                url: '/Admin/DashboardChart',
+                type: "GET",
+                data: { "days": $("#Dashboard-select").val() },
+                success: function (response) {
+                    let xValuesR = [0];
+                    let yValuesR = [0];
+                    let xValuesC = [0];
+                    let yValuesC = [0];
+                    response.revenue.forEach(function (element) {
+                        var date = new Date(Date.parse(element.day));
+                        date = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + (date.getUTCDate())
+                        xValuesR.push(date);
+                        yValuesR.push(element.value)
+                    })
+
+                    response.customer.forEach(function (element) {
+                        var date = new Date(Date.parse(element.day));
+                        date = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + (date.getUTCDate())
+                        xValuesC.push(date);
+                        yValuesC.push(element.value)
+                    })
+
+                    makeChartdynamic("Revenue-chart", xValuesR, yValuesR)
+                    makeChartdynamic("Customer-chart", xValuesC, yValuesC)
+                    console.log(response.revenue);
+                    console.log(response.customer);
+
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                    console.log(request.responseText)
+                }
+            })
+
+
+            $.ajax({
+                url: "/WaitingList/TokenCount",
+                type: "GET",
+                success: function (response) {
+                    $("#WaitingListCount").html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                    console.log(request.responseText)
+                }
+            })
+
+            $(document).on("change", "#Dashboard-select", function () {
+                if ($(this).val() == -1) {
+                    console.log('custom date')
+                    $('#customDateModal').modal("show");
+                }
+                else {
+                    console.log("---------------- ajax call left")
+                    console.log("ajax done")
+                    $.ajax({
+                        url: '/Admin/DashboardPV',
+                        type: "GET",
+                        data: { "days": $(this).val() },
+                        success: function (response) {
+                            let xValuesR = [0];
+                            let yValuesR = [0];
+                            let maxR = 5000;
+                            let xValuesC = [0];
+                            let yValuesC = [0];
+                            let maxC = 10;
+                            response.revenue.forEach(function (element) {
+                                var date = new Date(Date.parse(element.day));
+                                date = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + (date.getUTCDate())
+                                xValuesR.push(date);
+                                yValuesR.push(element.value)
+                                maxR = element.value > maxR ? element.value : maxR;
+                            })
+
+                            response.customer.forEach(function (element) {
+                                var date = new Date(Date.parse(element.day));
+                                date = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + (date.getUTCDate())
+                                xValuesC.push(date);
+                                yValuesC.push(element.value)
+                                maxC = element.value > maxC ? element.value : maxC;
+                            })
+
+                            makeChartdynamic("Revenue-chart", xValuesR, yValuesR, maxR)
+                            makeChartdynamic("Customer-chart", xValuesC, yValuesC, maxC)
+                            console.log("--------------------------------")
+                            console.log(response.revenue);
+                            console.log(response.customer)
+
+                        },
+                        error: function (request, status, error) {
+                            alert(request.responseText);
+                            console.log(request.responseText)
+                        }
+                    })
+
+
+                }
+
+
+                $.ajax({
+                    url: '/Admin/DashboardPV',
+                    type: "POST",
+                    data: { "days": $(this).val() },
+                    success: function (response) {
+                        $("#dashboard-main").html(response);
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                        console.log(request.responseText)
+                    }
+                });
+
+            });
+        });
+
+    </script>
+}

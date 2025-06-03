@@ -1,0 +1,767 @@
+@model pizzashop.data.ViewModels.OrderDisplay
+
+<div>
+
+    <div class="d-flex justify-content-between">
+        <div class="d-flex gap-3">
+            <div>
+                <img src="../images/icons/dinner-table.svg" alt="tableimg" height="50px">
+            </div>
+            <div>
+                <p class="m-0"> @Model.FloorName</p>
+                <p class="m-0"> Tables : @foreach (var tbl in Model.TableNames)
+                    {
+                        <span>@tbl</span>
+                    }
+                </p>
+            </div>
+            <p id="orderinstructions"></p>
+        </div>
+        <div class="d-flex me-2 gap-3">
+            <button class="btn btn-outline-border-primary text-primary" data-bs-toggle="modal"
+                data-bs-target="#qr-modal"><i class="bi bi-qr-code-scan"></i></button>
+            <button class="btn btn-outline-border-primary text-primary" id="ordercustomerbtn"><i
+                    class="bi bi-person-lines-fill"></i></button>
+            <button class="btn btn-outline-border-primary text-primary" id="orderinstructionbtn"><i
+                    class="bi bi-chat-left-text"></i></button>
+        </div>
+    </div>
+
+    @* loop on items *@
+
+    <div class="row m-0 mt-2">
+        <div class="col-1">
+
+        </div>
+        <div class="col-4">
+            <p>Item</p>
+        </div>
+        <div class="col-3">
+            <p>quantity</p>
+        </div>
+        <div class="col-2">
+            <p>amount</p>
+        </div>
+        <div class="col-2">
+
+        </div>
+    </div>
+
+    <div class="sidebarscroll ">
+        <div>
+            <hr>
+            @foreach (var item in Model.Items)
+            {
+                <div class="row m-0 item-present orderpreviewitem" data-id="@item.DetailsId">
+                    <div class="col-1">
+                        @if (item.Modifiers.Count > 0)
+                        {
+                            <button class="accordion-button p-0" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapse-@(item.Name.Replace(" ",""))" aria-expanded="false" aria-controls="collapseOne">
+                            </button>
+                        }
+
+                    </div>
+                    <div class="col-4 item-present-comment" data-id="@item.DetailsId">
+                        <div class="w-100">@item.Name </div>
+                        <div id="collapse-@(item.Name.Replace(" ",""))" class="mt-2 accordion-collapse collapse "
+                            data-bs-parent="#accordionExample">
+                            <div class="accordion-body p-0">
+                                <ul class="p-0 m-0">
+                                    @foreach (var modifer in item.Modifiers)
+                                    {
+                                        <li class="d-flex justify-content-between modifiers-@item.DetailsId"
+                                            data-id="@modifer.ModiferId">
+                                            <p class="m-0">@modifer.Name</p>
+                                            <p class="m-0">@modifer.Price</p>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                        <p id="detailsinstruction-@item.DetailsId" hidden>fefefefef</p>
+                    </div>
+                    <div class=" col-3">
+                        <div class="btn btn-outline-border-primary p-0">
+                            <div class="row m-0 p-2 ">
+                                <div class="col-4 subtractbtn " data-id="@item.DetailsId">
+                                    <button class="btn text-primary p-0"><strong>-</strong></button>
+                                </div>
+                                <div class="col-4 kotitemquantity text-center m-auto">
+                                    <span class="itemcount" id="prepared-@item.DetailsId" hidden>@item.Prepared</span>
+                                    <span class="itemquatity" id="quantity-@item.DetailsId">@item.Quantity</span>
+                                </div>
+                                <div class="col-4 addbtn" data-id="@item.DetailsId">
+                                    <button class="btn text-primary p-0"><strong>+</strong></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <p class="m-0" id="itemprice-@item.DetailsId" data-rate="@item.Price"> @(item.Price * item.Quantity)
+                        </p>
+                        <p class="m-0" id="modifierprice-@item.DetailsId"
+                            data-rate="@item.Modifiers.Select(s => s.Price).Sum()"> @(item.Modifiers.Select(s =>
+                        s.Price).Sum()
+                        * item.Quantity)</p>
+                    </div>
+                    <div class="col-2">
+                        <button class="btn btn-outline-border-primary deleteorderitem text-primary" @(item.Prepared > 0 ?
+                        "disabled" : "") data-id="@item.DetailsId"><i class="bi bi-trash"></i></button>
+                    </div>
+                </div>
+                <hr>
+            }
+
+        </div>
+        <div id="orderitemdisplay">
+
+        </div>
+    </div>
+    <div>
+        <div class="d-flex justify-content-between">
+            Subt total
+            <p id="subtotal"></p>
+        </div>
+        @* loop on taxes *@
+        @foreach (var tax in Model.Taxes)
+        {
+            <div class="d-flex justify-content-between">
+                <div class="d-flex">
+                    <input type="checkbox" class="tax-chk" @(tax.IsDefault == true ? "hidden checked" : "")
+                    @(tax.OrderTaxid > 0 ? "checked" : "") data-id="@tax.TaxId" data-type="@tax.Type"
+                        data-value="@tax.Amount">
+                    <p>@tax.Name</p>
+                </div>
+                <p id="tax-amount-@tax.TaxId">0</p>
+            </div>
+        }
+
+        <div class="d-flex justify-content-between">
+            <h5>Total</h5>
+            <h5 id="order-total">5673974</h5>
+        </div>
+
+        <div class="d-flex justify-content-between ">
+            <p>Payment method</p>
+            <div class="d-flex justify-content-between gap-3">
+                <div>
+                    <input type="radio" name="paymentmethod" value="cash" @(Model.PaymentMethod == "cash" ? "checked" :
+                        "")>
+                    <label for="cash">cash</label>
+                </div>
+                <div>
+                    <input type="radio" name="paymentmethod" value="card" @(Model.PaymentMethod == "card" ? "checked" :
+                        "")>
+                    <label for="card">card</label>
+                </div>
+                <div>
+                    <input type="radio" name="paymentmethod" value="upi" @(Model.PaymentMethod == "upi" ? "checked" :
+                        "")>
+                    <label for="upi">upi</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="row">
+        <div class="col-lg-3 col-6">
+            <button class="w-100 btn  btn-primary" id="saveorder">Save</button>
+        </div>
+        <div class="col-lg-3 col-6">
+            <button class="w-100 btn btn-outline-border-primary" @(Model.Items.Any() ? "" : "disabled")
+                id="completeorder">Complete</button>
+        </div>
+        <div class="col-lg-3 col-6">
+            <button class="w-100 btn btn-outline-border-primary" @(Model.OrderStauts == "completed" ? "" : "disabled")
+                id="orderinvoice" data-id="@Model.Orderid"><small>Invoice</small></button>
+        </div>
+        <div class="col-lg-3 col-6 end-0">
+            <button class="w-100 btn btn-outline-border-primary" id="ordercancel">Cancel</button>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="modal fade" id="instruction-modal" tabindex="-1" aria-hidden="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-primary"><strong id="instruction-header"></strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body ">
+                <textarea class="w-100" id="instruction" rows="4" cols="50"></textarea>
+            </div>
+            <div class="modal-footer ">
+                <button type="submit" id="instruction-submit" data-id=0 class="btn btn-primary"
+                    data-bs-dismiss="modal">Yes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="qr-modal" tabindex="-1" aria-hidden="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-primary"><strong> Menu</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="../images/QR.png" alt="qr">
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="submit" data-id=0 class="btn btn-outline-primary" data-bs-dismiss="modal">Done</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="OrderCompeleteModal" tabindex="-1" aria-labelledby="SingleDeleteModalLabel"
+    aria-hidden="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="SingleDeleteModalLabel">Order Complete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center d-block">
+                <img src="~/images/warning-icon.svg" alt="warning" width="50px">
+                <p>Are you sure you want to complete order ?</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="submit" id="completebtn" class="btn btn-primary" data-bs-dismiss="modal">Yes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="Customer-Review" tabindex="-1" aria-hidden="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-primary"><strong> Customer Review</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body ">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <p class="m-0">Food</p>
+                        <div class="d-flex gap-3">
+                            <div>
+                                <input type="radio" name="Food-rating" value=1 id="food1" hidden>
+                                <label for="food1"><i class="bi bi-star Food-stars text-warning"></i></label>
+                            </div>
+                            <div>
+                                <input type="radio" name="Food-rating" value=2 id="food2" hidden>
+                                <label for="food2"><i class="bi bi-star Food-stars text-warning"></i></label>
+                            </div>
+                            <div>
+                                <input type="radio" name="Food-rating" value=3 id="food3" hidden>
+                                <label for="food3"><i class="bi bi-star Food-stars text-warning"></i></label>
+                            </div>
+                            <div>
+                                <input type="radio" name="Food-rating" value=4 id="food4" hidden>
+                                <label for="food4"><i class="bi bi-star Food-stars text-warning"></i></label>
+                            </div>
+                            <div>
+                                <input type="radio" name="Food-rating" value=5 id="food5" hidden>
+                                <label for="food5"><i class="bi bi-star Food-stars text-warning"></i></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <p class="m-0">Service</p>
+                        <div class="d-flex gap-3">
+                            <div>
+                                <input type="radio" name="Service-rating" value=1 id="Service1" hidden>
+                                <label for="Service1"><i class="bi bi-star Service-stars text-warning"></i></label>
+                            </div>
+                            <div>
+                                <input type="radio" name="Service-rating" value=2 id="Service2" hidden>
+                                <label for="Service2"><i class="bi bi-star Service-stars text-warning"></i></label>
+                            </div>
+                            <div><input type="radio" name="Service-rating" value=3 id="Service3" hidden>
+                                <label for="Service3"><i class="bi bi-star Service-stars text-warning"></i></label>
+                            </div>
+                            <div>
+                                <input type="radio" name="Service-rating" value=4 id="Service4" hidden>
+                                <label for="Service4"><i class="bi bi-star Service-stars text-warning"></i></label>
+                            </div>
+                            <div>
+                                <input type="radio" name="Service-rating" value=5 id="Service5" hidden>
+                                <label for="Service5"><i class="bi bi-star Service-stars text-warning"></i></label>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <p class="m-0">Ambience</p>
+                        <div class="d-flex gap-3">
+                            <div>
+
+                                <input type="radio" name="Ambience-rating" value=1 id="Ambience1" hidden>
+                                <label for="Ambience1"><i class="bi bi-star Ambience-stars text-warning "></i></label>
+                            </div>
+                            <div>
+
+                                <input type="radio" name="Ambience-rating" value=2 id="Ambience2" hidden>
+                                <label for="Ambience2"><i class="bi bi-star Ambience-stars text-warning"></i></label>
+                            </div>
+                            <div>
+
+                                <input type="radio" name="Ambience-rating" value=3 id="Ambience3" hidden>
+                                <label for="Ambience3"><i class="bi bi-star Ambience-stars text-warning"></i></label>
+                            </div>
+                            <div>
+
+                                <input type="radio" name="Ambience-rating" value=4 id="Ambience4" hidden>
+                                <label for="Ambience4"><i class="bi bi-star Ambience-stars text-warning"></i></label>
+                            </div>
+                            <div>
+
+                                <input type="radio" name="Ambience-rating" value=5 id="Ambience5" hidden>
+                                <label for="Ambience5"><i class="bi bi-star Ambience-stars text-warning"></i></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <textarea class="w-100" id="Review-Comments" rows="4" cols="50"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="submit" id="reviewsubmit" class="btn btn-outline-primary">Save</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="customer-model">
+
+</div>
+
+<script>
+
+    function OrderAjax(url, data) {
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: data,
+            success: function (response) {
+                console.log(response)
+            },
+            error: function (request, status, error) {
+                alert(request.responseText);
+            }
+        });
+    }
+
+    $(document).ready(function () {
+
+        console.log($(".deleteorderitem:disabled").length);
+        if ($(".deleteorderitem:disabled").length > 0) {
+            $("#ordercancel").attr("disabled", true);
+        }
+    });
+    calSubtotal();
+    // instruction modal
+    $(document).on("click", '#orderinstructionbtn', function () {
+        $('#instruction-header').html("Special Instructions");
+        $("#instruction").attr("placeholder", "Instructions");
+        $("#instruction").val('@Model.Instruction');
+        $("#instruction-modal").modal("show");
+    });
+
+    $(document).on("click", ".item-present-comment", function () {
+        $('#instruction-header').html("Order Wise Comment");
+        $("#instruction").attr("placeholder", "comments");
+        var id = $(this).data("id");
+        $("#instruction").val($(`#detailsinstruction-${id}`).html());
+        $("#instruction-submit").data("id", $(this).data("id"));
+        $("#instruction-modal").modal("show");
+    });
+
+    $(document).on("click", "#instruction-submit", function () {
+        let data = $("#instruction").val();
+        if ($("#instruction-submit").data("id") != 0) {
+            let classname = '#detailsinstruction-' + $(this).data("id");
+            console.log(classname)
+            $(classname).html(data);
+            $("#instruction").val("");
+        } else {
+            $("#orderinstructions").html(data);
+            $("#instruction").val("");
+        }
+    });
+    // end instruction
+
+    // customer modal
+    $(document).on("click", "#ordercustomerbtn", function () {
+        console.log("modal--clicking")
+        $.ajax({
+            url: '@Url.Action("CustomeDetailModal", "OrderMenu")',
+            type: "GET",
+            data: { "orderId": @Model.Orderid, "customerId": @Model.CustomerId},
+            success: function (response) {
+                $("#customer-model").html(response);
+                $("#customer-details").modal("show");
+            },
+            error: function (request, status, error) {
+                alert(request.responseText);
+            }
+        });
+    });
+    // modal end
+
+
+    $(document).on("click", ".addbtn", function () {
+        console.log("hello")
+        let id = $(this).data("id");
+        let quantity = parseInt($(`#quantity-${id}`).html());
+        let rate = $(`#itemprice-${id}`).data("rate");
+        quantity++;
+        console.log(rate)
+        $(`#quantity-${id}`).html(quantity);
+        $(`#itemprice-${id}`).html(quantity * rate);
+
+        rate = $(`#modifierprice-${id}`).data("rate");
+        $(`#modifierprice-${id}`).html(quantity * rate);
+        calSubtotal();
+    });
+
+    $(document).on("click", ".subtractbtn", function () {
+        console.log("world")
+        let id = $(this).data("id");
+        console.log(id)
+
+        let quantity = parseInt($(`#quantity-${id}`).html());
+        // backend call for prepared
+        $.ajax({
+            url: "@Url.Action("CheckPrepared", "OrderMenu")",
+            type: "POST",
+            data: { "Detailsid": id },
+            success: function (response) {
+                let prepared = response;
+                let rate = $(`#itemprice-${id}`).data("rate");
+                quantity--;
+                if (prepared > quantity || 0 >= quantity) {
+                    toastr.error("quantity cant be less than prepared or 0");
+                } else {
+                    $(`#quantity-${id}`).html(quantity);
+                    $(`#itemprice-${id}`).html(quantity * rate);
+                    rate = $(`#modifierprice-${id}`).data("rate");
+                    $(`#modifierprice-${id}`).html(quantity * rate);
+                    calSubtotal();
+                }
+            },
+            error: function (request, status, error) {
+                alert(request.responseText);
+            }
+        });
+
+    });
+
+    $(document).on("click", ".deleteorderitem", function () {
+        if ($(this).parent().parent().hasClass("new-item")) {
+            console.log("item not save can be deleted deleted")
+            $(this).parent().parent().parent().remove();
+            return;
+        }
+
+        let url = '@Url.Action("DeleteItem", "OrderMenu")';
+        let data = { "Detailsid": $(this).data("id") };
+        let element = $(this).closest(".orderpreviewitem")
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: data,
+            success: function (response) {
+                console.log(response)
+                if (response.length > 0) {
+                    toastr.error(response);
+                } else {
+                    toastr.success("Item Removed From Order")
+                    element.remove();
+                }
+
+            },
+            error: function (request, status, error) {
+                alert(request.responseText);
+            }
+        });
+
+    });
+
+    // save order
+    $(document).on("click", "#saveorder", function () {
+        console.log("-----------");
+
+        let DetailsList = [];
+        let taxlist = [];
+
+        $(".item-present").each(function () {
+            let id = $(this).data("id");
+
+            let classname = `#quantity-${id}`;
+            let quantity = parseInt($(classname).html());
+            classname = `.modifiers-${id}`;
+            let modiferListId = [];
+            $(classname).each(function () {
+                modiferListId.push($(this).data("id"));
+            })
+            classname = `#detailsinstruction-${id}`;
+            let instruction = $(classname).html();
+            DetailsList.push(
+                { 'DetailsId': id, "ItemId": 0, "Quantity": quantity, "Instruct": instruction, "ModifierStr": JSON.stringify(modiferListId) }
+            );
+
+        });
+
+        $(".new-item").each(function () {
+            let itemid = $(this).data("itemid");
+            let modifercount = $(this).data("modifiercount");
+            let classname = `#quantity-0-${itemid}-${modifercount}`;
+            let quantity = parseInt($(classname).html());
+
+            classname = `.modifiers-0-${itemid}-${modifercount}`;
+            let modiferListId = [];
+            $(classname).each(function () {
+                modiferListId.push($(this).data("id"));
+            })
+
+            DetailsList.push(
+                { 'DetailsId': 0, "ItemId": itemid, "Quantity": quantity, "Instruct": "", "ModifierStr": JSON.stringify(modiferListId) }
+            );
+        });
+
+
+        $(".tax-chk:checked").each(function () {
+            let taxid = $(this).data("id");
+            let amount = parseInt($(`#tax-amount-${taxid}`).html());
+            taxlist.push({ "TaxId": taxid, "Amount": amount })
+        });
+
+        console.log(taxlist);
+        console.log(DetailsList);
+        console.log($("#orderinstructions").html());
+        console.log(JSON.stringify(DetailsList))
+        let data = { "OrderId": @Model.Orderid, "PaymentMode": $('input[name=paymentmethod]:checked').val(), "OrderInstruct": $("#orderinstructions").html(), "DetailsString": JSON.stringify(DetailsList), "TaxString": JSON.stringify(taxlist) };
+        console.log(data)
+
+        let url = '@Url.Action("UpdateOrder", "OrderMenu")';
+        OrderAjax(url = url, data = data);
+        url = "@Url.Action("Index", "OrderMenu")" + `?orderid=@Model.Orderid`;
+        window.location.replace(url);
+    });
+
+    // Complete -- orderid +taxes 
+
+    $(document).on("click", "#completeorder", function () {
+        $.ajax({
+            url: "@Url.Action("CheckOrderComplete", "OrderMenu")",
+            type: "POST",
+            data: data,
+            success: function (response) {
+                if (response) {
+                    $("#OrderCompeleteModal").modal("show")
+                }
+                else {
+                    toastr.error("not all items are prepared");
+                }
+
+            },
+            error: function (request, status, error) {
+                alert(request.responseText);
+            }
+        });
+
+
+    });
+
+    $(document).on('click', "#completebtn", function () {
+        let url = '@Url.Action("CompleteOrder", "OrderMenu")';
+        let taxlist = [];
+        $(".tax-chk:checked").each(function () {
+            let taxid = $(this).data("id");
+            let amount = parseInt($(`#tax-amount-${taxid}`).html());
+            taxlist.push({ "TaxId": taxid, "Amount": amount })
+        });
+        console.log(taxlist);
+
+        let data = {
+            "OrderId": @Model.Orderid, "PaymentMode": $('input[name=paymentmethod]:checked').val(),
+            "Total": parseInt($("#order-total").html()), "TaxString": JSON.stringify(taxlist)
+        };
+        console.log(data)
+
+        OrderAjax(url = url, data = data);
+
+        $("#Customer-Review").modal("show")
+    })
+
+
+    $(document).on("click", "#ordercancel", function () {
+        let url = '@Url.Action("CancelOrder", "OrderMenu")';
+        let data = { "orderId": @Model.Orderid}
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: data,
+            success: function (response) {
+                if (response) {
+                    toastr.success("order deleted successfully");
+                } else {
+                    toastr.error("can't cancel order as item was prepared")
+                }
+            },
+            error: function (request, status, error) {
+                alert(request.responseText);
+            }
+        });
+    });
+    // Cancel -- orderid only
+
+
+    // customer revies script
+
+
+
+    $(document).on("click", "input[name=Food-rating]", function () {
+        let ratingStars = $(".Food-stars");
+        let stars = parseInt($(this).val());
+        ratingStars.each(function () {
+            $(this).removeClass("warning bi-star-fill");
+            $(this).addClass("  bi-star");
+            if (stars > 0) {
+                $(this).removeClass("bi-star");
+                $(this).addClass(" bi-star-fill");
+                stars--;
+            }
+        });
+    });
+
+    $(document).on("click", "input[name=Service-rating]", function () {
+        let ratingStars = $(".Service-stars");
+        let stars = parseInt($(this).val());
+        ratingStars.each(function () {
+            $(this).removeClass("warning bi-star-fill");
+            $(this).addClass("bi-star");
+            if (stars > 0) {
+                $(this).removeClass("bi-star");
+                $(this).addClass("  bi-star-fill");
+                stars--;
+            }
+        });
+    });
+
+    $(document).on("click", "input[name=Ambience-rating]", function () {
+        let ratingStars = $(".Ambience-stars");
+        let stars = parseInt($(this).val());
+        ratingStars.each(function () {
+            $(this).removeClass("text-warning bi-star-fill");
+            $(this).addClass("bi-star");
+            if (stars > 0) {
+                $(this).removeClass("bi-star");
+                $(this).addClass("  bi-star-fill");
+                stars--;
+            }
+        });
+    });
+
+    $(document).on("click", "#reviewsubmit", function () {
+        let url = '@Url.Action("CustomerReview", "OrderMenu")';
+        let data = {
+            "OrderId": @Model.Orderid, "CustomerId": @Model.CustomerId, "Food": parseInt($('input[name=Food-rating]:checked').val()),
+            "Service": parseInt($('input[name=Service-rating]:checked').val()), "Ambience": parseInt($('input[name=Ambience-rating]:checked').val()), "Descript": $("#Review-Comments").val()
+        };
+        console.log(data);
+        OrderAjax(url, data)
+        $('#Customer-Review').modal("hide");
+    });
+    // script end
+
+
+    $(".tax-chk").change(function () {
+
+        let id = $(this).data("id");
+        if (!$(this).is(":checked")) {
+            $(`#tax-amount-${id}`).html(0);
+        } else {
+            let taxamount = parseInt($("#subtotal").html());
+            let value = parseFloat($(this).data("value"))
+            let type = $(this).data("type")
+            if (type == "percentage") {
+                let taxamount = subtotal * value * .01;
+                $(`#tax-amount-${id}`).html(taxamount);
+                subtotal += taxamount;
+
+            } else {
+                $(`#tax-amount-${id}`).html(value);
+                subtotal += taxamount;
+            }
+        }
+        calSubtotal();
+    })
+
+
+    // helper function
+    function calSubtotal() {
+        let subtotal = 0;
+        let ordertotal = 0;
+        $(".item-present").each(function () {
+            let id = $(this).data("id");
+            subtotal += parseInt($(`#itemprice-${id}`).html());
+            subtotal += parseInt($(`#modifierprice-${id}`).html());
+        });
+
+        $(".new-item").each(function () {
+            let itemid = $(this).data("itemid");
+            let modifercount = $(this).data("modifiercount");
+            let classname = `0-${itemid}-${modifercount}`;
+            subtotal += parseInt($(`#itemprice-${classname}`).html());
+            subtotal += parseInt($(`#modifierprice-${classname}`).html());
+        });
+
+        $("#subtotal").html(subtotal);
+        ordertotal += subtotal;
+
+        $(".tax-chk:checked").each(function () {
+            let id = $(this).data("id");
+            let type = $(this).data("type");
+            let value = parseFloat($(this).data("value"));
+
+            if (type == "percentage") {
+                let taxamount = subtotal * value * .01;
+                $(`#tax-amount-${id}`).html(taxamount);
+                ordertotal += taxamount;
+
+            } else {
+                $(`#tax-amount-${id}`).html(value);
+                ordertotal += taxamount;
+            }
+
+            console.log(subtotal);
+        });
+
+        $("#order-total").html(ordertotal);
+    }
+
+    $(document).on("click", "#orderinvoice", function () {
+        console.log("pdf btn clc");
+        var url = '/Order/OrderInvoice?OrderId=' + $(this).data("id");
+        console.log(url);
+        window.location.href = url;
+    });
+
+    //  
+</script>

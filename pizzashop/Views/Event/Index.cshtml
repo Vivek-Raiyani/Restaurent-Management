@@ -1,0 +1,108 @@
+@{
+    ViewData["Title"] = "Event";
+    Layout = "_adminlayout";
+}
+
+<div class="container mt-5 " id="eventcontainer">
+    <form>
+        <div class="d-flex row mb-4 gy-2">
+
+            <div class="col-lg-4">
+                <h3 class="text-primary"> <strong>Events</strong></h3>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="row gy-2">
+                    <div class="col-xl-6  d-flex gap-3 ">
+                        <div class="row gx-2 gy-2 m-0 w-100">
+                            <div class="col-7">
+                            </div>
+                            <div class="col-5">
+                                <select class="form-select" id="eventstatus" aria-label="Floating label" value="1">
+                                    <option selected value="allstatus">All Status</option>
+                                    <option value="onhold">On Hold</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="failed">Failed</option>
+                                    <option value="progress">Progress</option>
+                                    <option value="served">Served</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-xl-6 d-flex gap-3 justify-content-end">
+                        <div class="row gx-2 gy-2 m-0 w-100">
+
+                            <div class="col-6">
+                                <button type="button" class="btn btn-primary w-100" id="exportevents">
+                                    <div class="d-flex justify-content-center">
+                                        <i class="bi bi-box-arrow-in-down-right"></i>
+                                        Export
+                                    </div>
+
+                                </button>
+                            </div>
+
+                            <div class="col-6">
+                                <a class="btn btn-primary w-100" id="Addevent" href="/Event/AddEvent">
+                                    <div class="d-flex justify-content-center">
+                                        Add Event
+                                    </div>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="row gx-2 gy-2 m-0 w-100">
+                    <div class="col-md-6">
+                        <input class="btn w-100 btn-outline-border-primary" type="search" placeholder="Customer"
+                            name="search" id="eventSearch" aria-label="Search">
+                        <label for="search" id="searchlable" class="position-absolute text-primary"
+                            style="margin-left: -35px; margin-top: 5px;">
+                            <i class="bi bi-search"></i>
+                        </label>
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select" id="eventtime" aria-label="Floating label" value="1">
+                            <option selected value=1>All Time</option>
+                            <option value=7>Last 7 days</option>
+                            <option value=30>Last 30 Days</option>
+                            <option value=0>Current Month</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-7">
+                <div class="row gx-2 gy-2 m-0">
+                    <div class="col-lg-4 col-md-4 col-6">
+                        <input type="date" class="form-control" id="eventstartdate" />
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-6">
+                        <input type="date" class="form-control" id="eventenddate" />
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-6">
+                        <button type="button" class="btn btn-primary w-100" id="eventdaterange">
+                            Search
+                        </button>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-6">
+                        <button type="reset" class="btn btn-outline-primary w-100" id="EventClear">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+
+
+
+    <div id="EventTable">
+
+    </div>
+</div>

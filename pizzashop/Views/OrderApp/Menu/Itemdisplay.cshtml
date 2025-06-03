@@ -1,0 +1,84 @@
+@model List<pizzashop.data.ViewModels.CategoryItems>
+
+@if (Model.Any())
+{
+    <div class="row mb-4 gy-3 gx-3">
+        @foreach (var item in Model)
+        {
+            <div class="@(ViewBag.order == true ? "col-6" : "col-lg-4 col-sm-6" )">
+                <div class=" tile d-flex rounded">
+                    <div class="d-flex item-card m-2   menuitems" data-id="@item.Id">
+                        @{
+                            string url = item.Img == null ? "/images/dining-menu.png" : item.Img;
+                        }
+                        <div class=" img-card-item shadow rounded-circle" style="height: 70px; width:70px;">
+                            <img src="@url"  class="rounded-circle" alt="" height="70px" width="70px" style="object-fit: cover;">
+                        </div>
+                        @{
+                            string temp = item.Type == "nonveg" ? "corner-non" : item.Type == "veg" ? "corner-veg" : "corner-vegan";
+                        }
+                        <div class="@temp"></div>
+                    </div>
+                    <div class="d-flex flex-column menuitems w-100 h-100 ms-3 mt-2 gap-2" data-id="@item.Id">
+                        <p class="m-0" id="menuitemname-@item.Id">@item.Name</p>
+                        <div class="d-flex justify-content-between w-100 px-2 pt-2 align-items-center">
+                            <p class="m-0" id="menuitemrate-@item.Id">@item.Price</p>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column h-100" style="width: 25px;">
+                        @if(item.Type == "veg"){
+                            <div class="rounded border border-success" style="height: 25px; width: 25px;">
+                                <div class="rounded-circle bg-success" style="height: 15px; width: 15px; margin: 4px;"></div>
+                            </div>
+                        }
+                        else if(item.Type == "nonveg"){
+                            <div class="rounded border border-danger" style="height: 25px; width: 25px;">
+                                <div class="rounded-circle bg-danger" style="height: 15px; width: 15px; margin: 4px;"></div>
+                            </div>
+                        }
+                        else{
+                            <div class="rounded border border-warning" style="height: 25px; width: 25px;">
+                                <div class="rounded-circle bg-warning" style="height: 15px; width: 15px; margin: 4px;"></div>
+                            </div>
+                        }
+                        
+                        @if (item.IsFav == true)
+                            {
+                                <i class="bi bi-heart-fill like-btn mt-5 text-warning text-center" data-id="@item.Id"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-heart like-btn mt-5 text-center" data-id="@item.Id"></i>
+                            }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="d-flex w-100">No item found</div>
+}
+
+<script>
+    $(document).ready(function () {
+        $(".like-btn").click(function () {
+            console.log("jiehfiefleoiej")
+            let url = "@Url.Action("FavToggle", "OrderMenu")";
+            let data = { "itemid": $(this).data("id") };
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    console.log(response)
+                     $(".Menusidebarbtn[data-id='-1']").click()
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        });
+    })
+</script>

@@ -1,0 +1,52 @@
+@model pizzashop.data.ViewModels.ResetPassVM
+
+@{
+    ViewData["Title"] = "Reset Password";
+    Layout = "_authlayout";
+}
+
+
+<div class="container p-3" id="login-background">
+                    <div id="login-content">
+                        <div class="d-flex mb-4 justify-content-center">
+                            <img class="mt-1" src="pizzashop/images/logos/pizzashop_logo.png" alt="logo" width="130x">
+                            <h2 class="mt-5 page-text">Pizza Shop</h2>
+                        </div>
+
+                        <h3 class="mb-3"> Reset your Password,</h3>
+
+                        <form method="post" >
+                            <input type="hidden" asp-for="Email" />
+                            <input type="hidden" asp-for="Token" />
+                            <div class=" mb-3 position-relative">
+                                <div class="form-floating">
+                                    <input type="password" asp-for="Password" class="form-control" id="floatingPassword1"
+                                        placeholder="Password">
+                                    <label for="floatingPassword1">New Password</label>
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                </div>
+                                <label class="position-absolute top-0 end-0 mt-3 me-3"><img src="images/eye.svg" alt=""
+                                        width="20px"></label>
+                            </div>
+                            <div class=" mb-3 position-relative">
+                                <div class="form-floating">
+                                    <input type="password" asp-for="NewPassword" class="form-control" id="floatingPassword2"
+                                        placeholder="Password">
+                                    <label for="floatingPassword2">Confirn New Password</label>
+                                    <span asp-validation-for="NewPassword" class="text-danger"></span>
+                                </div>
+                                <label class="position-absolute top-0 end-0 mt-3 me-3"><img src="images/eye.svg" alt=""
+                                        width="20px"></label>
+                            </div>
+                            <!--
+                            <button type="submit" class="btn btn-primary mb-3" style="width: 100%;">Submit</button>
+                            -->
+                            <button class="btn btn-primary mb-3 page-linking"  href="">Send</button>
+                            <p class="text-center"><a class="text-decoration-none page-text"
+                                    href="pizza_shop_login.html">Back to Login</a></p>
+                        </form>
+                    </div>
+
+
+
+                </div>

@@ -1,0 +1,396 @@
+@model pizzashop.data.ViewModels.PaginatedListVM<pizzashop.data.ViewModels.UserlistVM>
+
+
+
+<!-- user nav -->
+<div class=" container  mt-5 mb-4">
+    <div class="row gx-3 gy-3">
+        <h3 class="col-lg-4 text-primary"> <strong>Users</strong></h3>
+        <div class="col-lg-8 d-flex justify-content-end">
+            <div>
+                <input class="btn btn-outline-border-primary me-2 " type="search" placeholder="Search" name="search"
+                    id="search" value="@Model.Search" aria-label="Search">
+                @if (Model.Search == null || Model.Search == "")
+                {
+                    <label for="search" class="position-absolute text-primary" style="margin-left: -35px; margin-top: 5px;">
+                        <i class="bi bi-search"></i>
+                    </label>
+                }
+
+            </div>
+
+            <a class="btn btn-primary" asp-action="AddUser" asp-controller="User"><small>+Add User</small></a>
+        </div>
+    </div>
+</div>
+
+<!--user list-->
+<div class="container ">
+    <div class="tile">
+        <div class="table-responsive p-4  ">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col d-flex">
+                            Name
+                            <!-- for small screen remove btn-->
+                            <i class="bi bi-arrow-down userdescending"></i>
+                            <i class="bi bi-arrow-up  userascending"></i>
+                        </th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Phone</th>
+                        <th scope="col d-flex">
+                            Role
+                            <!-- for small screen remove btn-->
+                            <i class="bi bi-arrow-down roledescending"></i>
+                            <i class="bi bi-arrow-up  roleascending"></i>
+                        </th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in @Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex">
+                                    <img src="@item.ProfileImg" class="rounded-circle" alt="pic" width="40px" height="40px">
+                                    <p>@item.Fname @item.Lname</p>
+                                </div>
+
+                            </td>
+                            <td>@item.Email</td>
+
+                            <td>@item.PhoneNo</td>
+                            <td>@item.RoleName</td>
+                            <td>
+                                @if (@item.Status == true)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Inactive</span>
+                                }
+
+                            </td>
+                            <td class="d-flex">
+                                <form asp-action="EditUser" asp-controller="User" method="get">
+                                    <input type="hidden" name="email" value="@item.Email">
+                                    <button type="submit" class="btn">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </form>
+                                <button type="button" class="btn openmodel" data-bs-toggle="modal"
+                                    data-bs-target="#exampleModal" data-id="@item.Email">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+
+        </div>
+        <div aria-label="Page navigation example" class="pb-2">
+            <form asp-action="Users" method="post">
+                <ul class=" pagination justify-content-end text-center">
+                    <li class="page-item m-1">
+                        <small>User per page</small>
+                        <input type="text" value="@Model.Search" hidden>
+                        <small>
+                            <select name="pagesize" id="pagesize" data-size="@Model.PageSize">
+                                <option asp-route-pagesize=3 id="opt3">3</option>
+                                <option asp-route-pagesize=5 id="opt5">5</option>
+                                <option asp-route-pagesize=10 id="opt10">10</option>
+                                <option asp-route-pagesize=15 id=opt15>15</option>
+                            </select>
+                        </small>
+                    </li>
+                    <li class=" page-item m-1 d-flex">
+                        <small> Showing @Model.PageIndex of @Model.TotalPages</small>
+                    </li>
+                    <li class="page-item m-1">
+
+                        <small class="page-link" aria-label="Previous" id="previous_page" data-currentpage="@Model.PageIndex">
+                            <span aria-hidden="true">&laquo;</span>
+                        </small>
+                    </li>
+                    <li class="page-item m-1">
+                        <small class="page-link" aria-label="Next" id="next_page" data-totalpage="@Model.TotalPages">
+                            <span aria-hidden="true">&raquo;</span>
+                        </small>
+                    </li>
+
+                    <!-- Previous Button -->
+
+                </ul>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Delete Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+                <div class="modal-body text-center d-block">
+                    <img src="~/images/warning-icon.svg" alt="warning" width="50px">
+                    <p>Are you sure you want to delete this user ?</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <input name="email" id="model-email" hidden>
+                    <button type="submit" id="deleteuser" class="btn btn-primary" data-bs-dismiss="modal">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    
+    $(document).ready(function () {
+        let url_ = '/Admin/Users';
+        // Set selected option from ViewBag.pageSize
+        let opt_value = $("#pagesize").data("size");
+        if (opt_value == 3) {
+            $('#opt3').attr('selected', 'selected');
+        } else if (opt_value == 5) {
+            $('#opt5').attr('selected', 'selected');
+        } else if (opt_value == 10) {
+            $('#opt10').attr('selected', 'selected');
+        } else if (opt_value == 15) {
+            $('#opt15').attr('selected', 'selected');
+        }
+
+    
+        let currentPage = $("#previous_page").data("currentpage");
+        let totalPages = $('#next_page').data("totalpage");
+        let s = $("#search").val();
+
+        if (currentPage > 1) {
+            $('#previous_page').on('click', function () {
+
+                currentPage--;
+                $.ajax({
+                    url: url_,
+                    type: "POST",
+                    data: { "page": currentPage, "pagesize": $("#pagesize").val(), "search": s },
+                    success: function (response) {
+                        $('#UserListPV').html(response);
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                    }
+                });
+            });
+        }
+
+        if (currentPage < totalPages) {
+            $('#next_page').on('click', function () {
+
+                console.log(currentPage);
+                currentPage++;
+                console.log(currentPage);
+                $.ajax({
+                    url: url_,
+                    type: "POST",
+                    data: { "page": currentPage, "pagesize": $("#pagesize").val(), "search": s },
+                    success: function (response) {
+                        $('#UserListPV').html(response);
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                    }
+                });
+            });
+        }
+
+        $('#pagesize').change(function () {
+
+            $.ajax({
+                url: url_,
+                type: "POST",
+                data: { "page": currentPage, "pagesize": $("#pagesize").val(), "search": s },
+                success: function (response) {
+                    $('#UserListPV').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        });
+
+        $('#search').change(function () {
+            console.log("-----------------------------")
+
+            $.ajax({
+                url: url_,
+                type: "POST",
+                data: { "page": currentPage, "pagesize": $("#pagesize").val(), "search": $(this).val() },
+                success: function (response) {
+                    $('#UserListPV').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        });
+
+        let userascending =0;
+        let userdescending = 0;
+        let roleascending =0;
+        let roledescending = 0;
+        $(".userascending").on("click", function () {
+            console.log("------------------------------")
+            if (userascending == 0) {
+                userascending = 1;
+                userdescending = 0;
+            } else {
+                userdescending = 0;
+                userascending = 0;
+            }
+            $.ajax({
+                url: url_,
+                type: "POST",
+                data: {
+                    "page": currentPage, "pagesize": $("#pagesize").val(), "search": s,
+                    "usera": userascending, "userd": userdescending, "rolea": roleascending, "roled": roledescending
+                },
+                success: function (response) {
+                    $('#UserListPV').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        })
+        $(".userdescending").on("click", function () {
+            console.log("------------------------------")
+            if (userdescending == 0) {
+                userdescending = 1;
+                userascending = 0;
+            } else {
+                userdescending = 0;
+                userascending = 0;
+            }
+            $.ajax({
+                url: url_,
+                type: "POST",
+                data: {
+                    "page": currentPage, "pagesize": $("#pagesize").val(), "search": s,
+                    "usera": userascending, "userd": userdescending, "rolea": roleascending, "roled": roledescending
+                },
+                success: function (response) {
+                    $('#UserListPV').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        });
+        $(".roleascending").on("click", function () {
+
+            console.log("------------------------------")
+            if (roleascending == 0) {
+                roleascending = 1;
+                roledescending = 0;
+            } else {
+                roleascending = 0;
+                roledescending = 0;
+            }
+            $.ajax({
+                url: url_,
+                type: "POST",
+                data: {
+                    "page": currentPage, "pagesize": $("#pagesize").val(), "search": s,
+                    "usera": userascending, "userd": userdescending, "rolea": roleascending, "roled": roledescending
+                },
+                success: function (response) {
+                    $('#UserListPV').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        });
+        $(".roledescending").on("click", function () {
+            console.log("------------------------------")
+            if (roledescending == 0) {
+                roledescending = 1;
+                roleascending = 0;
+            } else {
+                roledescending = 0;
+                roleascending = 0;
+            }
+            $.ajax({
+                url: url_,
+                type: "POST",
+                data: {
+                    "page": currentPage, "pagesize": $("#pagesize").val(), "search": s,
+                    "usera": userascending, "userd": userdescending, "rolea": roleascending, "roled": roledescending
+                },
+                success: function (response) {
+                    $('#UserListPV').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        });
+
+
+
+        $('.openmodel').on("click", function () {
+            var email = $(this).data('id');
+            console.log(email)
+            $("#model-email").val(email);
+
+        });
+
+        $('#deleteuser').on("click", function () {
+            $.ajax({
+                url: '/User/DeleteUser',
+                type: "DELETE",
+                contentType: "application/json",
+                dataType:"json",
+                processData:false,
+                data: {'email' : $("#model-email").val()},
+                success: function (response) {
+                    console.log(response)
+                    toastr.success(response.message);
+
+                    $.ajax({
+                        url: url_,
+                        type: "POST",
+                        data: {
+                            "page": currentPage, "pagesize": $("#pagesize").val(), "search": s,
+                            "usera": userascending, "userd": userdescending, "rolea": roleascending, "roled": roledescending
+                        },
+                        success: function (response) {
+                            $('#UserListPV').html(response);
+                        },
+                        error: function (request, status, error) {
+                            alert(request.responseText);
+                        }
+                    });
+                
+                },
+                error: function (request, status, error) {
+                    toastr.error(request.responseJSON.error);
+                }
+            });
+        })
+
+    });
+
+
+</script>

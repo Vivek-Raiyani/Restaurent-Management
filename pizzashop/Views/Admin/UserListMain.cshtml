@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Users";
+    Layout = "_adminlayout";
+}
+
+<div id="UserListPV">
+    
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function(){
+            const url = '/Admin/Users';
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (response) {
+                    $('#UserListPV').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                    console.log(request.responseText)
+                }
+            })
+        });
+    </script>
+
+
+}

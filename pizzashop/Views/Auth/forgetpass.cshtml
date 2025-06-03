@@ -1,0 +1,35 @@
+@model pizzashop.data.ViewModels.AuthVM
+
+@{
+    ViewData["Title"] = "Forget Password";
+    Layout = "_authlayout";
+}
+
+<div id="login-content">
+    <div class="d-flex mb-4 justify-content-center">
+       <img src="~/images/pizzashop_logo.png" alt="logo" width="150px">
+        <h2 class="mt-5 page-text">Pizza Shop</h2>
+    </div>
+
+    <h3 class="mb-3"> Forget Password,</h3>
+
+    <form  asp-action="Sendmail"  method="get">
+        <div class=" mb-3 position-relative">
+            <div class="form-floating">
+                <input type="email" class="form-control" asp-for="Email" id="floatingInput" placeholder="name@example.com">
+                <label for="floatingInput">Email address</label>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <label class="position-absolute top-0 end-0 mt-3 me-3">
+                <img src="pizzashop/images/icons/customer.svg" alt="" width="20px"></label>
+        </div>
+        <!--
+                            <button type="submit" class="btn btn-primary mb-3" style="width: 100%;">Send</button>
+                        -->
+        <button class="btn btn-primary mb-3 page-linking" type="submit">Send</button>
+        <p class="text-center"><a class="text-decoration-none page-text" asp-action="Index" >Back to Login</a>
+        </p>
+    </form>
+</div>
+
+

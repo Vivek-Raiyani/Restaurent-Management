@@ -1,0 +1,211 @@
+@model pizzashop.data.ViewModels.ModifierTableVM
+<input class="btn btn-outline-border-primary  w-50 Modifier-search-Modal" type="search" placeholder="Search"
+    name="search-iteam" id="iteam-search-Modal" value="@Model.Modifiers.Search" aria-label="Search">
+@if (Model.Modifiers.Search == null || Model.Modifiers.Search == "")
+{
+    <label id="searchicon" class="position-absolute" style="margin-left: -35px; margin-top: 5px;">
+        <i class="bi bi-search text-primary"></i>
+    </label>
+}
+@* Modifier-search-Modal *@
+<div class="table-responsive">
+    <table class="table">
+        <!-- iteam table head -->
+        <thead>
+            <tr>
+                <th>
+                    <input type="checkbox" id="all-iteam">
+                    @* data-id="@Model.ModiferGroupId" *@
+                </th>
+                <th class="align-content-center">
+                    Name
+                </th>
+                <th class="align-content-center">
+                    Unit
+                </th>
+                <th class="align-content-center">
+                    Rate
+                </th>
+                <th class="align-content-center">
+                    Quantity
+                </th>
+
+            </tr>
+        </thead>
+        <!-- iteam tabel body -->
+        <tbody>
+            @for (var i = 0; i < @Model.Modifiers.Items.Count(); i++)
+            {
+                <tr>
+                    <td class="align-content-center">
+                        <input type="checkbox" class="ModiferSelectCheck" data-id="@Model.Modifiers.Items[i].ModifierId"
+                            data-name="@Model.Modifiers.Items[i].ModName" >
+                        <input type="hidden" asp-for="@Model.Modifiers.Items[i].ModifierId"
+                            value="@Model.Modifiers.Items[i].ModifierId">
+                    </td>
+                    <td class=" align-content-center">
+                        <div class="d-flex">
+                            <small>@Model.Modifiers.Items[i].ModName</small>
+                        </div>
+                    </td>
+                    <td class=" align-content-center">
+                        @Model.Modifiers.Items[i].Unit
+                        <img class="icon-img" src="pizzashop/images/icons/non-veg-icon.svg" alt="">
+                    </td>
+                    <td class="align-content-center">
+                        @Model.Modifiers.Items[i].Rate
+                    </td>
+                    <td class=" align-content-center">
+                        @Model.Modifiers.Items[i].Quantity
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div aria-label="Page navigation example">
+        <form asp-action="ExistingModiferPagination" asp-controller="Menu" method="get">
+            <ul class="pagination justify-content-end ">
+                <li class="page-item m-2">
+                    Modifiers per page
+                    <input type="text" value="@ViewBag.search" hidden>
+                    <select name="pagesize" class="pagesizeModal" id="pagesize" data-size="@Model.Modifiers.PageSize">
+                        <option asp-route-pagesize=3 id="opt3">3</option>
+                        <option asp-route-pagesize=5 id="opt5">5</option>
+                        <option asp-route-pagesize=10 id="opt10">10</option>
+                        <option asp-route-pagesize=15 id=opt15>15</option>
+                    </select>
+                </li>
+                <li class=" page-item m-2">
+                    Showing <span id="addmodifiermodalcurrent">@Model.Modifiers.PageIndex</span> of <span
+                        id="addmodifermodaltotal">@Model.Modifiers.TotalPages</span>
+                </li>
+
+                <!-- Previous Button -->
+                <li class="page-item m-1">
+
+                    <p class="page-link previous_page_Modal " aria-label="Previous" data-currentpage="@Model.Modifiers.PageIndex"
+                        data-url="@Url.Action("ExistingModiferPagination", "Menu")">
+                        <span aria-hidden="true">&laquo;</span>
+                    </p>
+                </li>
+                <li class="page-item m-1">
+                    <p class="page-link next_page_Modal" aria-label="Next" data-totalpage="@Model.Modifiers.TotalPages"
+                        data-url="@Url.Action("ExistingModiferPagination", "Menu")">
+                        <span aria-hidden="true">&raquo;</span>
+                    </p>
+                </li>
+
+
+            </ul>
+        </form>
+    </div>
+
+</div>
+
+
+<script>
+    // pagination script
+    $(document).ready(function () {
+        
+        var url = "/Menu/ExistingModifierTable"
+        let currentPage = $(".previous_page_Modal").data("currentpage");
+        @* console.log(currentPage); *@
+        let totalPages = $(".next_page_Modal").data("totalpage");
+        @* console.log(totalPages); *@
+        let pagesize = $("#pagesize").data("size");
+        if (pagesize == 3) {
+            $('#opt3').attr('selected', 'selected');
+        } else if (pagesize == 5) {
+            $('#opt5').attr('selected', 'selected');
+        } else if (pagesize == 10) {
+            $('#opt10').attr('selected', 'selected');
+        } else if (pagesize == 15) {
+            $('#opt15').attr('selected', 'selected');
+        }
+
+
+
+        if (currentPage < totalPages) {
+            $('.next_page_Modal').on('click', function () {
+                currentPage++;
+                @* console.log('btn clicked---------nextpage', currentPage); *@
+                
+                let data = { 'page': currentPage, 'pagesize': pagesize, "search": $(".Modifier-search-Modal").val()};
+                @* console.log(url); *@
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: data,
+                    success: function (response) {
+                        $('#AddExistingModifierModel').html(response);
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                    }
+                });
+            });
+        }
+
+        $('.previous_page_Modal').on('click', function () {
+            console.log("hello" + currentPage);
+            if (currentPage > 1) {
+                currentPage--;
+                
+                @* console.log('btn clicked--------- previous_page'); *@
+                let data = { 'page': currentPage, 'pagesize': pagesize, "search": $(".Modifier-search-Modal").val() };
+                console.log(url);
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: data,
+                    success: function (response) {
+                        $('#AddExistingModifierModel').html(response);
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+
+                    }
+                });
+            }
+        });
+
+        $('.pagesizeModal').change(function () {
+            @* console.log("---------------------- pagesize") *@
+            
+            let data = { "pagesize": $(this).val(), "search": $(".Modifier-search-Modal").val() };
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    $('#AddExistingModifierModel').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        });
+
+
+        $('.Modifier-search-Modal').change(function () {
+            @* console.log("----------------------------- search") *@
+            
+            let data = { "pagesize": $(".pagesizeModal").val(), "search": $(this).val() };
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    $('#AddExistingModifierModel').html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        });
+
+
+
+    });
+
+</script>

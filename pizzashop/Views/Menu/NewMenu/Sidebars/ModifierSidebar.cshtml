@@ -1,0 +1,65 @@
+@model IEnumerable<pizzashop.data.ViewModels.ModifierGroupNameVM>
+
+
+<div class="row p-0">
+    <div class=" col-sm-4 col-lg-12 d-flex justify-content-between  mb-4 m-auto">
+        <p class="m-0 btn  text-primary"><strong>Modifiers</strong></p>
+        <button type="button" class="btn " id="addmodifergroupbtn">
+            <i class="bi bi-plus-square-fill"></i>
+        </button>
+    </div>
+    @* select dd *@
+    <div class=" col-sm-8 d-flex justify-content-around btn  ">
+        <div class="row w-100" id="navigation-select">
+            <div class="col-8">
+                <select class=" btn w-100 btn-outline-border-primary mb-4 navigation-list-modifier">
+                    @foreach (var group in Model)
+                    {
+                        <option value="@group.GroupId">@group.GroupName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-4">
+                <div class="d-flex gap-1">
+                    <button id="SelectedEditModifer" class=" btn btn-outline-border-primary text-primary">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+
+                    <button id="SelecteDeleteModifier" class=" btn btn-outline-border-primary text-primary" data-bs-toggle="modal"
+                            data-bs-target="#SingleDeleteModal" >
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div id="navigation-list" class="sidebarscroll mb-5">
+    <ul class="nav nav-pills nav-tabs-vertical " role="tablist">
+        @foreach (var group in Model)
+        {
+            <li class="nav-item vertical-tab-btn mb-2 modifierbtn d-flex justify-content-between" role="presentation" data-id="@group.GroupId">
+                <!--- target id dynamic -->
+                <a class="nav-link " id="vertical-tab-0 " data-bs-toggle="tab" href="#tabpanel-0" role="tab"
+                    aria-controls="vertical-tabpanel-1" aria-selected="true">
+                    <div class="d-flex  justify-content-between">
+                        <div class="d-flex ">
+                            <p class="m-auto"><i class="bi bi-three-dots-vertical"></i></p>
+                            <p class="m-auto">@group.GroupName</p>
+                        </div>
+                    </div>
+                </a>
+                 <div class="d-flex">
+                            <button class=" btn menu-sidebar-btn EditModifierClass" data-id="@group.GroupId"><i
+                                    class="bi bi-pencil"></i></button>
+
+                            <button class="btn menu-sidebar-btn DeleteModifierClass" data-id="@group.GroupId"
+                                data-bs-toggle="modal" data-bs-target="#SingleDeleteModal" data-name="group"><i
+                                    class="bi bi-trash"></i></button>
+                        </div>
+            </li>
+        }
+    </ul>
+</div>
+</div>

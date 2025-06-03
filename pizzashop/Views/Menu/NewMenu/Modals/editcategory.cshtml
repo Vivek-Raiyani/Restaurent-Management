@@ -1,0 +1,35 @@
+@model pizzashop.data.ViewModels.CategoryVM
+
+
+<!-- Modal edit category -->
+<div class="modal fade" id="addeditmodal" tabindex="-1" aria-labelledby="Add category" >
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-primary" ><strong id="Modal-heading">Category</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="categoryform">
+                <div class="modal-body ">
+                    <input id="editcategory" asp-for="CategoryID"  hidden>
+                    <span class="text-danger" asp-validation-for="CategoryID"></span>
+                    <input class="form-control mb-3" type="text" asp-for="CategoryName" id="new_category"
+                        placeholder="Name*">
+                        <span class="text-danger" id="new_categoryvalidate"></span>
+                        <span class="text-danger" asp-validation-for="CategoryName" ></span>
+                    <input class="form-control" type="textarea" row="5" asp-for="CategoryDescription" id="new_description"
+                        placeholder="Description*">
+                        <span class="text-danger" asp-validation-for="CategoryDescription"></span>
+                </div>
+                <div class="modal-footer ">
+                    <button type="submit"   class="btn btn-primary" data-bs-dismiss="modal">Yes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>

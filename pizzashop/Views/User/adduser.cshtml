@@ -1,0 +1,153 @@
+@model pizzashop.data.ViewModels.ProfileVM
+
+@{
+    ViewData["Title"] = "add user";
+    Layout = "_adminlayout";
+}
+ <!-- user nav -->
+                <div class="d-flex container justify-content-between mt-4">
+                    <h3 class="text-primary"><strong>Add New User</strong></h3>
+                    <a class="btn btn-primary" asp-action="UserMain" asp-controller="Admin" > Back</a>
+                </div>
+
+                <!-- user form -->
+                <div class="container">
+                    <div class="tile  mt-4 p-4 ">
+                    <form class="container mt-4" method="post" enctype="multipart/form-data">
+                        <div class="row mb-4 gy-2">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="floatingInput" placeholder="" asp-for="Fname" >
+                                    <span asp-validation-for="Fname" class="text-danger"></span>
+                                    <label for="floatingInput">First Name</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="floatingInput" placeholder="" asp-for="Lname">
+                                    <span asp-validation-for="Lname" class="text-danger"></span>
+                                    <label for="floatingInput">Last Name</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4 gy-2">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="username" placeholder="" asp-for='Username' >
+                                    <span class="text-danger" id="usernamevalidate"></span>
+                                    <span asp-validation-for="Username" class="text-danger" ></span>
+                                    <label for="username">Username</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <select class="form-select form-select-lg mb-3" aria-label="Default select example" asp-for="RoleId">
+                                     @foreach (var item in @Model.Roles){
+                                        <option value="@item.RoleId">@item.RoleName</option>
+                                     }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4 gy-2">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="email" class="form-control" id="email" placeholder=""  asp-for="Email" >
+                                    <span  class="text-danger" id="emailvalidate"></span>
+                                    <span asp-validation-for="Email" class="text-danger" ></span>
+                                    <label for="email">Email address</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class=" mb-3 position-relative">
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="floatingPassword" placeholder="" asp-for="Password" >
+                                        <span asp-validation-for="Password" class="text-danger"></span>
+                                        <label for="floatingPassword">Password</label>
+                                    </div>
+                                    <label class="position-absolute top-0 end-0 mt-3 me-2 bg-white"><img
+                                            src="images/eye.svg" alt="" width="20px"></label>
+                                </div>
+                            </div>
+                        </div>
+
+<!-- #region Description -->
+                        
+                        <label class="btn d-block mb-4 upload-btn" for="profileimage" id="upload-btn">
+                            <img src="images/cloud-upload-icon.svg" alt="">
+                            <p>Browse File</p>
+                        </label>
+                        <input type="file" style="display: none;" accept="image/jpeg, image/png" asp-for="MyImage" id="profileimage" onchange="preview()">
+                        
+                        
+                        @* <input type="file" asp-for="MyImage" hidden />
+                        <label class="btn d-block mb-4 upload-btn" asp-for="MyImage" id="upload-btn">
+                            <img src="images/cloud-upload-icon.svg" alt="">
+                            <p>Browse File</p>
+                        </label> *@
+<!-- #endregion -->
+                        <div class="row mb-4 gy-2">
+                            <div class="col-12 col-md-4">
+                                <select class="form-select form-select-lg " id='country' asp-for="Country" aria-label="Default select example" >
+                                    <option selected disabled>Select Country</option>
+                                </select>
+                                <span asp-validation-for="Country" class="text-danger"></span>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <select class="form-select form-select-lg " asp-for="State" id='state' aria-label="Default select example">
+                                    <option selected disabled>Select State</option>
+                                </select>
+                                <span asp-validation-for="State" class="text-danger"></span>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <select class="form-select form-select-lg" id="city" asp-for="City" aria-label="Default select example" >
+                                    <option selected disabled>Select City</option>
+                                </select>
+                                <span asp-validation-for="City" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4 gy-2">
+                            <div class="col-6 col-md-4">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="floatingInput" asp-for="Zipcode" placeholder="" >
+                                    <label for="floatingInput">Zip Code</label>
+                                    <span asp-validation-for="Zipcode" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="floatingInput" asp-for="Address" placeholder="" >
+                                    <label for="floatingInput">Address</label>
+                                    <span asp-validation-for="Address" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="phone" asp-for="PhoneNo" placeholder="" >
+                                    <label for="phone">Phone</label>
+                                    <span  class="text-danger" id="phonevalidate"></span>
+                                    <span asp-validation-for="PhoneNo" class="text-danger" ></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex mb-4">
+                            <button class="btn btn-primary me-3"> Create User </button>
+                            <a class="btn btn-outline-primary" asp-action="UserMain" asp-controller="Admin"> Cancel</a>
+                        </div>
+
+                    </form>
+                    </div>
+                </div>
+
+
+@section Scripts
+{
+    <script>
+        function preview() {
+            $("#upload-btn").html( `<img id="frame" src="" width="100%" height="200px"/>`)
+            frame.src=URL.createObjectURL(event.target.files[0]);
+        }
+    </script>
+    <script src="~/js/countrydd.js" asp-append-version="true"></script>
+}

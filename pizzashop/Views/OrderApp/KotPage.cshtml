@@ -1,0 +1,229 @@
+@{
+    ViewData["Title"] = "Order App";
+    Layout = "_orderappLayout";
+}
+
+<div class="container mt-5 p-0">
+
+    <h3 class="mb-5 text-primary"><strong>KOT</strong></h3>
+    @* slected dd for small screen *@
+    <div class=" d-flex justify-content-center btn  ">
+        <div id="navigation-select-div" class="btn btn-outline-border-primary mb-4 w-100">
+            <select id="navigation-select" class=" btn w-100 ">
+                <option value="0">All</option>
+            </select>
+        </div>
+    </div>
+    @* category name list *@
+    <div class="nav nav-pills tile p-2 text-primary" id="navigation-list" role="tablist">
+        <button class="nav-link active KotCategory" data-id=0 data-bs-toggle="tab" type="button">All</button>
+    </div>
+</div>
+
+
+
+
+
+<div Id="OrderList">
+
+</div>
+
+</div>
+
+
+<div id="KotOrderModal"></div>
+
+@section Scripts {
+    <script>
+
+        function GetCategories() {
+            console.log("--------------------")
+
+            let url = '@Url.Action("GetCategories", "Kot")';
+            console.log(url)
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (response) {
+                    console.log(response);
+                    response.forEach(function (category) {
+                        let btn = ` <button class="nav-link  KotCategory" data-id="${category.id}" data-bs-toggle="tab" type="button">${category.name}</button>`;
+                        $("#navigation-list").append(btn);
+
+                        let option = `<option value="${category.id}">${category.name}</option>`;
+                        $("#navigation-select").append(option);
+                    });
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+
+        }
+
+        // pageination feature 
+        function GetOrders(id, status) {
+            let url = '@Url.Action("OrderList", "Kot")';
+            console.log(url)
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: { "id": id, "status": status },
+                success: function (response) {
+                    $("#OrderList").html(response);
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        }
+
+        function UpdateOrderItemStatus(orderid, status, items) {
+            console.log(status + "-----------------------")
+            let url = '@Url.Action("KotOrderModal", "Kot")';
+            console.log(url)
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: { "orderid": orderid, "status": status, "detailsids": items },
+                success: function (response) {
+
+                    $("#WaitingTokenModal").modal("hide");
+                    window.location.reload();
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        }
+
+        function GetOrderModal(categoryid, status, orderid) {
+            let url = '@Url.Action("KotOrderModal", "Kot")';
+            console.log(url)
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: { "categoryid": categoryid, "status": status, "orderid": orderid },
+                success: function (response) {
+        @* console.log(response); *@
+                        $("#KotOrderModal").html(response);
+                    $("#WaitingTokenModal").modal("show");
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            // loading inital data
+            GetCategories();
+            GetOrders(0, "pending");
+
+
+
+            
+
+
+            $('.nextorderlist').click(function () {
+                // need to fetch next orders
+                console.log("Getting next order");
+                // ajax call
+            });
+
+            $('.previousorderlist').click(function () {
+                // need to fetch previous order
+                console.log("Getting previous order");
+                // ajax call
+            });
+
+
+
+        });
+
+        // to open the order modal for marking prepared
+        $(document).on("click", ".orderentry", function () {
+            let categoryid = $(".KotCategory.active").data("id");
+            let status = $(".Kotstatus.active").html() == "Ready" ? "ready" : "pending";
+            let orderid = $(this).data("orderid");
+            console.log("---" + categoryid + "---" + status + "---" + orderid)
+            GetOrderModal(categoryid = categoryid, status = status, orderid = orderid)
+        })
+
+        $(document).on('click', '.KotCategory', function () {
+            console.log("handling category change");
+            // ajax call
+            // data-id
+            // 2 things to pass id of category and the status
+            let status = $(".Kotstatus.active").html() == "Ready" ? "ready" : "pending";
+            console.log(status);
+            GetOrders($(this).data("id"), status);
+
+        });
+
+        @* navigation-select *@
+            $(document).on('change', '#navigation-select', function () {
+                console.log("handling category change");
+                // ajax call
+                // data-id
+                // 2 things to pass id of category and the status
+                let status = $(".Kotstatus.active").html() == "Ready" ? "ready" : "pending";
+                console.log(status);
+                GetOrders($(this).val(), status);
+
+            });
+
+        $(document).on("click", "#kotprogressbtn", function () {
+            debugger;
+            let orderid = $(this).data("orderid");
+            let status = $(this).data("status");
+            let itemsarr = [];
+            let itemrows = $(".itemrows");
+
+            itemrows.each(function () {
+                let id = $(this).data("id");
+                console.log(id);
+                let item = {};
+                let checkbox = $(`.kotitemcheckbox-${id}`).first();
+                let quantity = $(`#itemquatity-${id}`).html();
+                if (checkbox.is(':checked')) {
+                    item['detailsid'] = id;
+                    item['quantity'] = quantity;
+                    itemsarr.push(item);
+                }
+
+            })
+            console.log(itemsarr);
+            UpdateOrderItemStatus(orderid, status, itemsarr);
+
+
+        });
+
+        $(document).on("click", "#kotpreparedbtn", function () {
+        @*  function UpdateOrderItemStatus(orderid, status,items )  *@
+                console.log("---------------------------------");
+            let orderid = $(this).data("orderid");
+            let status = $(this).data("status");
+            let itemsarr = [];
+            let itemrows = $(".itemrows");
+            itemrows.each(function () {
+                let id = $(this).data("id");
+                let item = {};
+                let checkbox = $(`.kotitemcheckbox-${id}`).first();
+                let quantity = $(`#itemquatity-${id}`).html();
+                if (checkbox.is(':checked')) {
+                    item['detailsid'] = id;
+                    item['quantity'] = quantity;
+                    itemsarr.push(item);
+                }
+
+            })
+            console.log(itemsarr);
+            UpdateOrderItemStatus(orderid, status, itemsarr);
+        });
+
+
+
+    </script>
+
+}

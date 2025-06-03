@@ -1,0 +1,218 @@
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_adminlayout";
+}
+
+<div class="container p-0 mt-5 mb-4">
+    <div class="d-flex p-3 justify-content-between">
+        <h1 class="text-primary"><strong>Dashboard</strong></h1>
+        <select class=" btn text-primary btn-outline-border-primary" id="Dashboard-select">
+            <option value=1>Today</option>
+            <option value=7>Last 7 Days</option>
+            <option value=0 selected>Current Month</option>
+            <option value=30>Last 30 Days</option>
+            @* <option value=-1>Custom Date</option> *@
+        </select>
+    </div>
+
+    <div id="dashboard-main" class="w-100">
+
+    </div>
+
+</div>
+
+<div class="modal fade" id="customDateModal" aria-hidden="true" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title " id="staticBackdropLabel">Select Date Range</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body ">
+                <div class="row">
+                    <div class="form-floating col-6">
+                        <input for="StartDate" type="Date" class="form-control" id="customstartdate"
+                            placeholder="StartDate">
+                        <label for="StartDate" for="floatingInput" class="ms-3">Start Date</label>
+                    </div>
+                    <div class="form-floating col-6">
+                        <input for="EndDate" type="Date" class="form-control" id="customenddate" placeholder="EndDate">
+                        <label for="EndDate" for="floatingInput1" class="ms-3">End Date</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="button" class="btn btn-yes" data-bs-dismiss="modal" id="customtimeSubmit">Submit</button>
+                <button type="button" class="btn btn-no" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+
+
+    <script>
+
+        function makeChartdynamic(canvasid, xValues, yValues) {
+            new Chart(canvasid, {
+                type: "line",
+                data: {
+                    labels: xValues,
+                    datasets: [{
+                        fill: true,
+                        backgroundColor: "rgba(0,102,171,.7)",
+                        borderColor: "rgba(0,0,255,0.1)",
+                        data: yValues
+                    }]
+                },
+                options: {
+                    legend: { display: false },
+                    scales: {
+                        yAxes: [{ ticks: { min: 0 } }],
+                    }
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $.ajax({
+                url: "/Admin/DashboardPV",
+                type: "GET",
+                success: function (response) {
+                    $("#dashboard-main").html(response);
+
+                    $.ajax({
+                        url: '/Admin/DashboardChart',
+                        type: "GET",
+                        data: { "days": $("#Dashboard-select").val() },
+                        success: function (response) {
+                            console.log(response)
+                            let xValuesR = [0];
+                            let yValuesR = [0];
+                            let xValuesC = [0];
+                            let yValuesC = [0];
+                            response.revenue.forEach(function (element) {
+                                var date = new Date(Date.parse(element.day));
+                                date = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + (date.getUTCDate())
+                                xValuesR.push(date);
+                                yValuesR.push(element.value)
+                            })
+
+                            response.customer.forEach(function (element) {
+                                var date = new Date(Date.parse(element.day));
+                                date = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + (date.getUTCDate())
+                                xValuesC.push(date);
+                                yValuesC.push(element.value)
+                            })
+
+                            makeChartdynamic("Revenue-chart", xValuesR, yValuesR)
+                            makeChartdynamic("Customer-chart", xValuesC, yValuesC)
+
+                        },
+                        error: function (request, status, error) {
+                            alert(request.responseText);
+                            console.log(request.responseText)
+                        }
+                    })
+
+                    $.ajax({
+                        url: "/WaitingList/TokenCount",
+                        type: "GET",
+                        success: function (response) {
+                            $("#WaitingListCount").html(response);
+                        },
+                        error: function (request, status, error) {
+                            alert(request.responseText);
+                            console.log(request.responseText)
+                        }
+                    })
+
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                    console.log(request.responseText)
+                }
+            })
+
+
+
+
+            $(document).on("change", "#Dashboard-select", function () {
+                if ($(this).val() == -1) {
+                    console.log('custom date')
+                    $('#customDateModal').modal("show");
+                    return;
+                }
+                let day = $(this).val()
+                $.ajax({
+                    url: '/Admin/DashboardPV',
+                    type: "POST",
+                    data: { "days": day },
+                    success: function (response) {
+                        $("#dashboard-main").html(response);
+
+                        $.ajax({
+                            url: '/Admin/DashboardChart',
+                            type: "GET",
+                            data: { "days": day },
+                            success: function (response) {
+                                console.log(response)
+                                let xValuesR = [0];
+                                let yValuesR = [0];
+                                let maxR = 5000;
+                                let xValuesC = [0];
+                                let yValuesC = [0];
+                                let maxC = 10;
+                                response.revenue.forEach(function (element) {
+                                    var date = new Date(Date.parse(element.day));
+                                    date = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + (date.getUTCDate())
+                                    xValuesR.push(date);
+                                    yValuesR.push(element.value)
+                                    maxR = element.value > maxR ? element.value : maxR;
+                                })
+
+                                response.customer.forEach(function (element) {
+                                    var date = new Date(Date.parse(element.day));
+                                    date = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + (date.getUTCDate())
+                                    xValuesC.push(date);
+                                    yValuesC.push(element.value)
+                                    maxC = element.value > maxC ? element.value : maxC;
+                                })
+
+                                makeChartdynamic("Revenue-chart", xValuesR, yValuesR, maxR)
+                                makeChartdynamic("Customer-chart", xValuesC, yValuesC, maxC)
+                                console.log("--------------------------------")
+                            },
+                            error: function (request, status, error) {
+                                alert(request.responseText);
+                                console.log(request.responseText)
+                            }
+                        })
+
+                        $.ajax({
+                            url: "/WaitingList/TokenCount",
+                            type: "GET",
+                            success: function (response) {
+                                $("#WaitingListCount").html(response);
+                            },
+                            error: function (request, status, error) {
+                                alert(request.responseText);
+                                console.log(request.responseText)
+                            }
+                        })
+
+
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                        console.log(request.responseText)
+                    }
+                });
+            });
+
+        });
+    
+    </script>
+}

@@ -1,0 +1,359 @@
+@model pizzashop.data.ViewModels.AddEditItemVM
+<!-- Modal add new iteam-->
+<div class="modal fade" id="addeditmodal" tabindex="-1" aria-labelledby="Add category">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-primary" ><strong id="Modal-heading"> Menu Iteam</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body  ">
+                <form id="ItemFormData">
+                    @* asp-action="AddItemModal" asp-controller="Menu" method="post" enctype="multipart/form-data" *@
+                    <input type="hidden" asp-for="@Model.ItemId" >
+                    <div class="container">
+                        <div class="row gy-2">
+                            <div class="col-12 col-md-8">
+                                <div class="row gy-2">
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-floating">
+                                            @if (Model.Categories.Count > 0)
+                                            {
+                                                <select id="categoryselect" asp-for="@Model.CategoryId" class="form-select">
+                                                    <option disabled> select Category </option>
+                                                    @for (var i = 0; i < @Model.Categories.Count; i++)
+                                                    {
+                                                        <option value="@Model.Categories[i].Id">@Model.Categories[i].Name
+                                                        </option>
+                                                    }
+                                                </select>
+                                            }
+                                            else
+                                            {
+                                                <input type="text" class="form-control" asp-for="@Model.CategoryName"
+                                                    id="additeam-1" placeholder="" disabled>
+                                                <input asp-for="@Model.CategoryId" hidden>
+                                            }
+                                            <label for="categoryselect">Category</label>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" asp-for="@Model.Name" id="itemname"
+                                                placeholder="">
+                                            <span class="text-danger" id="itemnamevalidate"></span>
+                                            <span class="text-danger" asp-validation-for="@Model.Name"></span>
+                                            <label for="itemname">Name*</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row gy-2">
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="form-floating">
+                                            <select id="typeselect" class="form-select" asp-for="@Model.Type">
+                                                <option value="veg" selected>Veg</option>
+                                                <option value="nonveg">Non-Veg</option>
+                                                <option value="vegan">Vegan</option>
+                                            </select>
+                                            <span class="text-danger" asp-validation-for="@Model.Type"></span>
+                                            <label for="typeselect">Type</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="form-floating mb-3">
+                                            <input asp-for="@Model.Rate" class="form-control" id="additeam-2"
+                                                placeholder="">
+                                            <span class="text-danger" asp-validation-for="@Model.Rate"></span>
+                                            <label for="additeam-2">Rate*</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="form-floating mb-3">
+                                            <input asp-for="@Model.Quantity" class="form-control" id="additeam-3"
+                                                placeholder="">
+                                            <span class="text-danger" asp-validation-for="@Model.Quantity"></span>
+                                            <label for="additeam-3">Quantity*</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="form-floating">
+                                            <select id="unitselected" asp-for="@Model.Unit" class="form-select">
+                                                <option value="g" selected>gram</option>
+                                                <option value="pcs">Pieces</option>
+                                            </select>
+                                            <span class="text-danger" asp-validation-for="@Model.Unit"></span>
+                                            <label for="unitselected">Unit</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row gy-2">
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" asp-for="@Model.Available"
+                                                id="flexSwitch-available">
+                                            <label class="form-check-label" for="flexSwitch-available">Available</label>
+                                            <span class="text-danger" asp-validation-for="@Model.Available"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="Switch-defaulttax">
+                                            @* <span class="text-danger"
+                                            asp-validation-for="Model.itemVM.CategoryId"></span> *@
+                                            <label class="form-check-label" for="Switch-defaulttax">Default
+                                                Tax</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="form-floating mb-3">
+                                            <input asp-for="@Model.TaxPercentage" class="form-control" id="additeam-4"
+                                                placeholder="">
+                                            <span class="text-danger" asp-validation-for="@Model.TaxPercentage"></span>
+                                            <label for="additeam-4">Tax Percentage</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="form-floating mb-3">
+                                            <input asp-for="@Model.ShortCode" class="form-control" id="additeam-5"
+                                                placeholder="">
+                                            <span class="text-danger" asp-validation-for="@Model.ShortCode"></span>
+                                            <label for="additeam-5">Short Code</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" asp-for="@Model.Description"
+                                            id="form-description" style="height: 100px"></textarea>
+                                        <span class="text-danger" asp-validation-for="@Model.Description"></span>
+                                        <label for="form-description">Description</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <p>Upload Image</p>
+                                    <label for="iteam-file" id="upload-btn">
+                                        <div class=" btn btn-outline-secondary d-flex justify-content-around">
+                                            <img class="icon-img" src="images/cloud-upload-icon.svg" alt="">
+                                            <p>Drag and Drop or Browse files</p>
+                                        </div>
+                                    </label>
+                                    <input type="file" asp-for="@Model.FormFile" accept="image/jpeg, image/png"  id="iteam-file" style="display: none;"
+                                        onchange="preview()">
+
+                                </div>
+                            </div>
+                            <div class="col-md-4" style="background-color: blanchedalmond;">
+                                <div class="w-100 p-2">
+                                    <button class="btn btn-outline-border dropdown-toggle w-100" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        Select ModifierGroup
+                                    </button>
+                                    <ul class="dropdown-menu" id="groupopts">
+                                    </ul>
+                                    <p id="nomodfound"> </p>
+                                </div>
+
+
+
+                                <div id="SelectedNodifiers" style="max-height: 350px; overflow-y: auto;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer ">
+                        <button type="submit" class="btn btn-primary">Yes</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+
+<script>
+    function preview() {
+        $("#upload-btn").html(`<img id="frame" src="" width="100%" height="200px"/>`)
+        frame.src = URL.createObjectURL(event.target.files[0]);
+    }
+</script>
+
+@* ajax call i think for the drop down modifiers *@
+<script>
+
+
+    $(document).ready(function () {
+        @* console.log("requesting modifiergroup data") *@
+        let url = "/Menu/ModifierGroupSidebarJson";
+        $.ajax({
+            url: url,
+            type: "GET",
+            success: function (response) {
+                if(response.length){
+                    response.forEach(function (group) {
+                    let opts = $("#groupopts");
+                    opts.append(`<li><input type="checkbox" value=${group.groupId} class="groupcheckbox${group.groupId} groupcheckbox" > ${group.groupName}  </li>`);
+                    });
+                }
+                else{
+                    $("#nomodfound").html("no valid groups found");
+                }
+
+                
+            },
+            error: function (request, status, error) {
+                alert(request.responseText);
+            }
+        });
+
+        // adding the existing mapping if present
+        @* console.log("requesting modifier mappings") *@
+        @* console.log(@Model.ItemId); *@
+        url = "/Menu/ItemGroups";
+        $.ajax({
+            url: url,
+            type: "GET",
+            data: { "itemid": $("#ItemId").val()},
+            success: function (response) {
+                console.log(response);
+                if (!response && !Object.keys(response).length > 0) {
+                    console.log("-----------null---------------")
+                } else {
+                    response.forEach(function (group) {
+                        let modifiercard = `
+                        <hr>
+                     <div class="modifergroupdisplay" id="modifergroupdisplay${group.groupId}"  data-id="${group.groupId}">
+                        <div class="d-flex justify-content-between mb-2">
+                            <p id="mapping${group.groupId}">${group.mappingId}</p>
+                            <p id="name${group.groupId}">${group.name}</p>
+                            <p>
+                                <i class="bi bi-trash  deletemodifiergroup" data-id="${group.groupId}"></i>
+                            </p>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <p> Min </p>
+                            <select id="minimum${group.groupId}" class="minimum">`
+                        let i =1;
+                        group.modifiers.forEach(function(){
+                            modifiercard += `<option value ="${i}" >${i}</option>`
+                            i++;
+                        })
+
+                        modifiercard += `</select>
+                        <p> Max</p>
+                            <select id="maximum${group.groupId}" class="maximun">`
+                        i=1;
+                        group.modifiers.forEach(function() {
+                            modifiercard += `<option value ="${i}" >${i}</option>`
+                        });
+
+                        modifiercard += ` </select>
+
+                        </div>
+                        <div>`;
+                        group.modifiers.forEach(function (modifier) {
+                            modifiercard += `<div class="d-flex justify-content-between">
+                                <p>${modifier.name}</p>
+                                <p>${modifier.rate}</p>
+                            </div>`
+                        })
+                        modifiercard += "</div></div>";
+
+                        $("#SelectedNodifiers").append(modifiercard);
+                        $(`.groupcheckbox${group.groupId}`).prop('checked', true);
+                    });
+                }
+            },
+            error: function (request, status, error) {
+                alert(request.responseText);
+            }
+        });
+
+    });
+
+    $(document).off("change", ".groupcheckbox").on("change", ".groupcheckbox", function () {
+        let groupid = $(this).val();
+        // if checked then add else remove
+        if ($(this).is(":checked")) {
+            let url = "/Menu/GetItemGroups";
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: { "groupid": groupid },
+                success: function (response) {
+                    console.log(response);
+                    if (!response && !Object.keys(response).length > 0) {
+                        console.log("-----------null---------------")
+                    } else {
+                        let modifiercard = `<hr>
+                     <div class="modifergroupdisplay" id="modifergroupdisplay${groupid}" data-id="${groupid}">
+                        <div class="d-flex justify-content-between mb-2">
+                            <p hidden id="mapping${groupid}">0</p>
+                            <p id="name${groupid}">${response.name}</p>
+                            <p>
+                                <i class="bi bi-trash  deletemodifiergroup" data-id="${groupid}"></i>
+                            </p>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            Min
+                            <select id="minimum${groupid}" class="minimum">`
+                        let i=1;
+                        response.modifiers.forEach(function(){
+                            modifiercard += `<option value ="${i}" >${i}</option>`
+                            i++;
+                        });
+
+                        modifiercard += `</select>
+                            Max
+                            <select id="maximum${groupid}" class="maximun">`
+                            i =1;
+                        response.modifiers.forEach( () => {
+                            modifiercard += `<option value ="${i}" >${i}</option>`
+                            i++;
+                        })
+                        modifiercard += `
+                            </select>
+                        </div>
+                        <div>`;
+                        response.modifiers.forEach(function (modifier) {
+                            modifiercard += `<div class="d-flex justify-content-between">
+                                <p>${modifier.name}</p>
+                                <p>${modifier.rate}</p>
+                            </div>`
+                        })
+                        modifiercard += "</div></div>";
+
+                        $("#SelectedNodifiers").append(modifiercard);
+                        $(`.groupcheckbox${groupid}`).prop('checked', true);
+                    }
+                },
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                }
+            });
+        }
+        else {
+            console.log("nothing happed");
+            $(`#modifergroupdisplay${groupid}`).remove();
+        }
+    });
+
+
+    $(document).off("click", ".deletemodifiergroup").on("click", ".deletemodifiergroup", function () {
+        let groupId = $(this).data("id");
+        console.log(groupId)
+        $(`.groupcheckbox${groupId}`).prop('checked', false);
+        $(this).closest(".modifergroupdisplay").remove();
+    });
+
+
+</script>

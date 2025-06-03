@@ -1,0 +1,344 @@
+@{
+    ViewData["Title"] = "Order App";
+    Layout = "_orderappLayout";
+}
+
+@model IEnumerable<pizzashop.data.ViewModels.OrderApp.Tables.OrderSectionVM>
+
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-7">
+            <h3 class="text-primary"><strong>Table View</strong></h3>
+        </div>
+        <div class="col-md-5">
+            <div class=" row justify-content-end text-center text-primary">
+                <p class="col-md-3 col-6 "><i class="bi bi-circle-fill text-secondary"></i>Available</p>
+                <p class="col-md-3 col-6"><i class="bi bi-circle text-success"></i> Selected</p>
+                <p class="col-md-3 col-6 "><i class="bi bi-circle-fill text-success"></i> Assigned</p>
+                <p class="col-md-3 col-6"><i class="bi bi-circle-fill text-primary"></i> Running</p>
+            </div>
+        </div>
+    </div>
+
+@* accordian view for table *@
+    @* <div class="accordion" id="accordionExample">
+  <div class="accordion-item">
+    @foreach (var floor in Model)
+    {
+    <h2 class="accordion-header">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne-@floor.Id" aria-expanded="true" aria-controls="collapseOne">
+                <h3 class="text-start col-4 text-primary">@floor.Name</h3>
+                <div class=" d-flex col-8 align-text-centre justify-content-end gap-3">
+                    <p class="m-0 pt-2"><i class="bi bi-circle-fill text-secondary"></i>
+                        @floor.tables.Where(t => t.Status == "available").Count()</p>
+                    <p class="m-0 pt-2"><i class="bi bi-circle-fill text-success"></i>
+                        @floor.tables.Where(t => t.Status == "occupied").Count()</p>
+                    <p class="m-0 pt-2"><i class="bi bi-circle-fill text-primary"></i>
+                        @floor.tables.Where(t => t.Status == "running").Count()</p>
+                </div>
+      </button>
+    </h2>
+    <div id="collapseOne-@floor.Id" class="accordion-collapse collapse " data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <div class="card card-body">
+                   
+                    @if(floor.tables.Count() == 0){
+                        <p class="text-center">No Table to Show</p>
+                    }else{
+                    <div class="row gy-2 gx-2">
+                        @foreach (var table in floor.tables)
+                        {
+                            <div class="col-lg-3 col-md-4 col-sm-6">
+                                <input type="checkbox" class="@("Section"+floor.Id) "
+                                 id="@(table.Name+table.Id)" value="@table.Id" hidden @(table.Status == "available" ? "" : "disabled" )>
+                                <label for="@(table.Name+table.Id)"   class="w-100 ">
+                                    <div data-orderid="@table.orderId" class="card p-3 h-100 @(table.Status == "occupied" ? "occupied ordermenuredirect" : "" ) 
+                                            @(table.Status == "running" ? "running ordermenuredirect" : "" )">
+                                        <div class="title d-flex justify-content-between align-items-center">
+                                            <div>@table.Name</div>
+                                            <span>@table.subtotal</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <i class="bi bi-people"></i>
+                                                <p>@table.capacity</p>
+                                            </div>
+                                            <div>
+                                                <i class="bi bi-stopwatch"></i>
+                                                @if (table.Status == "available")
+                                                {
+                                                    <p>0 min</p>
+                                                }
+                                                else
+                                                {
+                                                    // we need to subtract this from current time
+                                                    <p>@table.orderduration</p>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+
+                        }
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-outline-primary assignoffcanvasBtn" disabled data-id="@floor.Id"
+                            data-name="@("Section" + floor.Id)">Assign</button>
+                    </div>
+                    }
+                </div>
+      </div>
+    </div>
+    }
+  </div>
+</div>
+<br>
+<br> *@
+@* collapse view for table *@
+    @foreach (var floor in Model)
+    {
+        <div class="row tile mb-3 ">
+
+            <button class="btn d-flex col-lg-10 justify-content-between sectiondetails" data-bs-toggle="collapse"
+                data-bs-target="#@floor.Name.Replace(" ", "")" role="button" aria-expanded="false"
+                aria-controls="collapseExample">
+                <h3 class="text-start col-4 text-primary">@floor.Name</h3>
+                <div class=" d-flex col-8 align-text-centre justify-content-end gap-3">
+                    <p class="m-0 pt-2"><i class="bi bi-circle-fill text-secondary"></i>
+                        @floor.Tables.Where(t => t.Status == "available").Count()</p>
+                    <p class="m-0 pt-2"><i class="bi bi-circle-fill text-success"></i>
+                        @floor.Tables.Where(t => t.Status == "occupied").Count()</p>
+                    <p class="m-0 pt-2"><i class="bi bi-circle-fill text-primary"></i>
+                        @floor.Tables.Where(t => t.Status == "running").Count()</p>
+                </div>
+            </button>
+            <div class="col-lg-2 btn d-flex justify-content-end ">
+                <button class="btn btn-outline-primary waitlistTokenBtn" data-bs-toggle="modal"
+                    data-bs-target="#WaitingTokenModal" data-id="@floor.Id">+<small>Waiting
+                        Token</small></button>
+            </div>
+
+            <div class="collapse mb-2" id="@floor.Name.Replace(" ","")">
+                <div class="card card-body">
+                    @if(floor.Tables.Count() == 0){
+                        <p class="text-center">No Table to Show</p>
+                    }else{
+                    <div class="row gy-2 gx-2">
+                        @foreach (var table in floor.Tables)
+                        {
+                            <div class="col-lg-3 col-md-4 col-sm-6">
+                                <input type="checkbox" class="@("Section"+floor.Id) "
+                                 id="@(table.Name+table.Id)" value="@table.Id" hidden @(table.Status == "available" ? "" : "disabled" )>
+                                <label for="@(table.Name+table.Id)"   class="w-100 ">
+                                    <div data-orderid="@table.OrderId" class="card p-3 h-100 @(table.Status == "occupied" ? "occupied ordermenuredirect" : "" ) 
+                                            @(table.Status == "running" ? "running ordermenuredirect" : "" )">
+                                        <div class="title d-flex justify-content-between align-items-center">
+                                            <div>@table.Name</div>
+                                            <span>@table.SubTotal</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mt-2">
+                                            <div>
+                                                <i class="bi bi-people"></i>
+                                                <p>@table.Capacity</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-end"><i class="bi bi-stopwatch "></i></p>
+                                                @if (table.Status == "available")
+                                                {
+                                                    <p>0 min</p>
+                                                }
+                                                else
+                                                {
+                                                    // we need to subtract this from current time
+                                                    <p class="live-time-update" data-time="@table.OrderDuration.ToString("o")"></p>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+
+                        }
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-outline-primary assignoffcanvasBtn" disabled data-id="@floor.Id"
+                            data-name="@("Section" + floor.Id)">Assign</button>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+
+</div>
+
+
+<div class="modal modal-dialog-scrollable fade" id="WaitingTokenModal" data-bs-backdrop="static"
+    data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel">
+    <div class="modal-dialog  modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Waiting Token Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="AddWaitingToken" asp-controller="WaitingList" method="post">
+
+                <div id="newWaitingtoken"></div>
+                <div class="d-flex justify-content-end gap-3 mt-3">
+                    <button type="submit" id="assignbtn"  class="btn btn-primary">Assign</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        aria-label="Close">Close</button>
+                </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="OffcanvasCode"></div>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+
+@section Scripts{
+<script>
+    $(document).ready(function () {
+        console.log("------")
+        $(".sectiondetails:first").click();
+        $(".accordion-button:first").click();
+        $('.waitlistTokenBtn').on("click", function () {
+            let id = $(this).data("id");
+            if (id == undefined) {
+                id = 0;
+            }
+            let url = '@Url.Action("AddWaitingToken", "WaitingList")';
+            $.ajax({
+                url: url,
+                type: "GET",
+                data: { "floorid": id },//
+                success: function (response) {
+                    console.log(response);
+                    $("#newWaitingtoken").html(response);
+                },
+                error: function (request, Status, error) {
+                    alert(request.responseText);
+                }
+            });
+
+        })
+
+
+        $(".assignoffcanvasBtn").on("click", function () {
+            let id = $(this).data("id");
+            let tableclass = $(this).data("name");
+            let tableids = [];
+            let table_select = $(`.${tableclass}:checked`);
+
+            table_select.each(function (table) {
+                console.log(table);
+                tableids.push($(this).val());
+                console.log(tableids);
+            });
+
+            let url = '@Url.Action("AssignPV", "OrderTable")';
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: { "floorid": id, "tableids": tableids },
+                success: function (response) {
+                    console.log(response);
+                    $("#OffcanvasCode").html(response);
+                    $("#AssignTableoffcanvas").offcanvas("show");
+                },
+                error: function (request, Status, error) {
+                    alert(request.responseText);
+                }
+            });
+        })
+
+        
+
+        $("input[type=checkbox]").on("change",function(){
+            let assignButton = $(this).closest('.card-body').find('.assignoffcanvasBtn');
+            if($("input[type=checkbox]:checked").length>0){
+                assignButton.removeAttr('disabled');
+                console.log("------------------------------------");
+            }else{
+                assignButton.attr('disabled','true');
+            }
+            if($(this).is(":checked")){
+                // add border class
+                $(this).parent().children("label").addClass("selected");
+
+            }else{
+                // remove border class
+                $(this).parent().children("label").removeClass("selected");
+            }
+        });
+
+        $(".ordermenuredirect").on("click", function(){
+            console.log("----------hello---------------");
+            let orderid= $(this).data("orderid");
+            console.log(orderid);
+            if(orderid != undefined){
+                let url ="@Url.Action("Index","OrderMenu")"+`?orderid=${orderid}`;
+                window.location.replace(url);
+            }else{
+                console.log("error occured in passing orderid");
+            }
+            
+        })
+
+        function updateOrderTime(){
+           
+        $(".live-time-update").each(function(){
+         
+            var dateString = "";
+            var time = $(this).data("time");
+            if(!time){
+                $(this).text("0 Min");
+                return;
+            }
+            var date1 = new Date(time);
+            var date2 = new Date();
+            var diff = date2.getTime() - date1.getTime();
+            var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            diff -=  days * (1000 * 60 * 60 * 24);
+            if(days> 0){
+                dateString+= days +" days ";
+            }
+            var hours = Math.floor(diff / (1000 * 60 * 60));
+            diff -= hours * (1000 * 60 * 60);
+            if(hours> 0){
+                dateString+= hours +" hours ";
+            }
+            var mins = Math.floor(diff / (1000 * 60));
+            diff -= mins * (1000 * 60);
+            if(mins > 0){
+                dateString+= mins + " min ";
+            }
+            var seconds = Math.floor(diff / (1000));
+            diff -= seconds * (1000);
+            dateString += seconds + " sec";
+            $(this).text(dateString);
+        });
+        }
+        updateOrderTime()
+        setInterval(updateOrderTime,1000);
+
+
+    });
+</script>
+}
+

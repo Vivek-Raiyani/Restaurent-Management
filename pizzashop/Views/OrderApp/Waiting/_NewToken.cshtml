@@ -1,0 +1,75 @@
+@model pizzashop.data.ViewModels.OrderApp.Waiting.WaitingTokenVM
+
+@* waitlist modal *@
+<div class="modal modal-dialog-scrollable fade" id="WaitingTokenModal" data-bs-backdrop="static"
+    data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel">
+    <div class="modal-dialog  modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Waiting Token Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            @* form data to be submited *@
+            <form asp-action="AddWaitingToken" asp-controller="WaitingList"  method="post">
+                <div class="modal-body">
+                    <div class="row gy-2">
+                        <input asp-for="@Model.TokenId" hidden>
+                        <!-- Table Name -->
+                        <div class="form-floating margintop col-12">
+                            <input type="text" class="form-control" id="waitingemail" asp-for="Email" placeholder="Table Name" value="@Model.Email">
+                            <label for="waitingemail" class="ms-3">Email*</label>
+                            <span class="text-danger" asp-validation-for="Email"></span>
+                        </div>
+
+                        <!-- Floor Selection -->
+                        <div class="form-floating margintop col-12">
+                            <input type="text" class="form-control" id="floatingInputName" asp-for="Name" placeholder="Table Name" value="@Model.Name">
+                            <label for="floatingInputName" class="ms-3">Name*</label>
+                            <span class="text-danger" asp-validation-for="Name"></span>
+                        </div>
+
+                        <!-- Table Name -->
+                        <div class="form-floating margintop col-12">
+                            <input type="text" class="form-control" id="floatingInputPhone" asp-for="Phone" placeholder="Table Name" value="@Model.Phone">
+                            <label for="floatingInputPhone" class="ms-3">Mobile Number*</label>
+                            <span class="text-danger" asp-validation-for="Phone"></span>
+                        </div>
+
+                        <!-- Capacity -->
+                        <div class="form-floating margintop col-lg-6 col-md-6">
+                            <input class="form-control" id="floatingInput" placeholder="Capacity" asp-for="Persons" value="@Model.Persons">
+                            <label for="floatingInput" class="ms-3">No of Person(s)*</label>
+                            <span class="text-danger" asp-validation-for="Persons"></span>
+                        </div>
+
+                        <!-- Availability -->
+                        <div class="form-floating margintop col-lg-6 col-md-6">
+                            @* condition if count >1 then enableds *@
+                            <select class="form-select" id="WaitingFloor" aria-label="Floating label" asp-for="Sectionid">
+                               
+                                @foreach(var floor in Model.SectionVMs){
+                                    <option value="@floor.Id">@floor.Name</option>
+                                }
+
+                            </select>
+                            <label for="WaitingFloor" class="ms-3">Section*</label>
+                            <span class="text-danger" asp-validation-for="Sectionid"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer d-flex justify-content-end">
+                        <button type="submit" id="WaittokenSubmit" class="btn btn-yes btn-primary">Save</button>
+                        <button type="button" class="btn btn-no btn-outline-primary"
+                            data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+<script>

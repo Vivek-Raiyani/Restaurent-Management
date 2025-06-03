@@ -1,0 +1,344 @@
+@model pizzashop.data.ViewModels.PaginatedListVM<pizzashop.data.ViewModels.TableSection.TableVM>
+
+
+
+<div class="tab-pane active">
+    <div class="container pt-4">
+        <h3 class="text-primary"><strong>Tables</strong></h3>
+        <div class="row gx-2 gy-2">
+            <div class="col-lg-4 col-md-4"></div>
+            <div class="col-lg-4 col-md-4 col-12">
+                <input class="btn  w-100 btn-outline-border-primary" type="search" placeholder="Search" name="search"
+                    id="tableSearch" value="@Model.Search" aria-label="Search">
+                @if (@Model.Search == "")
+                {
+                    <label id="searchicon" class="position-absolute" style="margin-left: -35px; margin-top: 5px;">
+                        <i class="bi bi-search text-primary"></i>
+                    </label>
+                }
+            </div>
+            <div class="col-lg-1 col-md-1 col-2 ">
+                <button type="button" class="btn btn-outline-secondary w-100 ps-0 pe-0" data-bs-toggle="modal"
+                    data-bs-target="#deleteMultipleTable">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+            <div class="col-lg-3 col-md-3 col-10">
+                <button type="button" class="btn btn-primary  w-100" id="AddSectionTable">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-plus" viewBox="0 0 16 16">
+                        <path
+                            d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4">
+                        </path>
+                    </svg><small>Add Table</small>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div>
+
+
+
+        @if (Model.Items == null || !Model.Items.Any())
+        {
+            <div>
+                <p>No tables are available in this section.</p>
+                <input type="hidden" id="selectAllTable" value="@ViewBag.SectionId">
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive p-4">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">
+                                <div class="form-check">
+
+                                    <input class="form-check-input" type="checkbox" id="selectAllTable"
+                                        value="@Model.Items[0].SectionId">
+                                    <label class="form-check-label" for="selectAll"> Name </label>
+                                </div>
+
+                            </th>
+                            <th class="text-center">Capacity</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var table in Model.Items)
+                        {
+                            <tr class="text-center">
+                                <td>
+                                    <div class="d-flex align-tables-center gap-2">
+                                        <input class="form-check-input table-checkbox" type="checkbox" value="@table.TableId" >
+                                        <p class="m-0 foodtext">@table.TableName</p>
+                                    </div>
+                                </td>
+                                <td>@table.Capacity</td>
+                                <td>@table.Status</td>
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button class="btn btn-link text-dark p-0 EdittableId" data-id="@table.TableId">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        @if((bool)Context.Items["CanDelete"] == true){
+
+                                        <button class="btn btn-link text-dark p-0 deletetableid" data-bs-toggle="modal"
+                                            data-id="@table.TableId" data-bs-target="#deleteTable"
+                                            @(table.Status == "available" ? "" : "disabled")>
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @* pagination *@
+            <div aria-label="Page navigation example">
+                <form asp-action="GetSectionTables" asp-controller="TableSection" method="get">
+                    <ul class="pagination justify-content-end ">
+                        <li class="page-item m-2">
+                            User per page
+                            <input type="text" value="@Model.Search" hidden>
+                            <select name="pagesize" id="pagesize" data-size="@Model.PageSize">
+                                <option asp-route-pagesize=3 id="opt3">3</option>
+                                <option asp-route-pagesize=5 id="opt5">5</option>
+                                <option asp-route-pagesize=10 id="opt10">10</option>
+                                <option asp-route-pagesize=15 id=opt15>15</option>
+                            </select>
+                        </li>
+                        <li class=" page-item m-2">
+                            Showing @Model.PageIndex of @Model.TotalPages
+                        </li>
+
+                        <!-- Previous Button -->
+                        <li class="page-item m-1">
+
+                            <p class="page-link" aria-label="Previous" id="previous_page_table" data-currentpage="@Model.PageIndex"
+                                data-url="/TableSection/GetSectionTables">
+                                <span aria-hidden="true">&laquo;</span>
+                            </p>
+                        </li>
+                        <li class="page-item m-1">
+                            <p class="page-link" aria-label="Next" id="next_page_table" data-totalpage="@Model.TotalPages"
+                                data-url="/TableSection/GetSectionTables">
+                                <span aria-hidden="true">&raquo;</span>
+                            </p>
+                        </li>
+
+                    
+                    </ul>
+                </form>
+            </div>
+        }
+
+    </div>
+
+
+    <div id="AddEditTable"></div>
+
+    @* delete modal *@
+    <div class="modal fade" id="deleteTable" tabindex="1" aria-labelledby="exampleModalLabel" aria-hidden="false">
+        <form asp-action="DeleteTable" asp-controller="TableSection" method="post">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete Confirmation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center d-block">
+                        <img src="~/images/warning-icon.svg" alt="warning" width="50px">
+                        <p>Are you sure you want to delete this iteam ?</p>
+                        <input name="tableid" type="hidden" id="DeleteTable">
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="submit" class="btn btn-primary">Yes</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    @* mass delete modal *@
+    <div class="modal fade" id="deleteMultipleTable" tabindex="1" aria-labelledby="exampleModalLabel">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete Confirmation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center d-block">
+                        <img src="~/images/warning-icon.svg" alt="warning" width="50px">
+                        <p>Are you sure you want to delete this iteam ?</p>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="submit" id="MassDelete" class="btn btn-primary" data-bs-dismiss="modal">Yes</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+
+    <script>
+
+
+        $(document).ready(function () {
+            // Set selected option from ViewBag.pageSize
+            let opt_value = $("#pagesize").data("size");
+            if (opt_value == 3) {
+                $('#opt3').attr('selected', 'selected');
+            } else if (opt_value == 5) {
+                $('#opt5').attr('selected', 'selected');
+            } else if (opt_value == 10) {
+                $('#opt10').attr('selected', 'selected');
+            } else if (opt_value == 15) {
+                $('#opt15').attr('selected', 'selected');
+            }
+
+            // Previous Page Click Handler
+            let currentPage = $("#previous_page_table").data("currentpage");
+            let totalPages = $("#next_page_table").data("totalpage");
+            var sectionId = $("#selectAllTable").val();
+
+
+            let url = '/TableSection/GetSectionTables';
+
+            if (currentPage > 1) {
+                console.log("Curre" + currentPage)
+                $('#previous_page_table').on('click', function () {
+                    console.log("-----------------")
+                    currentPage--;
+                    console.log("currentpage -- " + currentPage)
+                    $.ajax({
+                        url: url,
+                        type: "GET",
+                        data: { "pageIndex": currentPage, "SectionId": sectionId, "pagesize": opt_value, "search": $('#tableSearch').val() },
+                        success: function (response) {
+                            $('#SectionTablePV').html(response);
+                        },
+                        error: function (request, status, error) {
+                            alert(request.responseText);
+                        }
+                    });
+                });
+            }
+
+            // Next Page Click Handler
+            if (currentPage < totalPages) {
+                $('#next_page_table').on('click', function () {
+                    currentPage++;
+                    console.log("currentpage -- " + currentPage)
+                        $.ajax({
+                            url: url,
+                            type: "GET",
+                            data: { "pageIndex": currentPage, "SectionId": sectionId, "pagesize": opt_value, "search": $('#tableSearch').val() },
+                            success: function (response) {
+                                console.log("-----------------------------")
+                                $('#SectionTablePV').html(response);
+                            },
+                            error: function (request, status, error) {
+                                alert(request.responseText);
+                            }
+                        });
+                });
+            }
+
+            // Pagesize Dropdown Change Event
+            $('#pagesize').change(function () {
+        
+                    console.log("@@@@@@@@@@")
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: { "pageIndex": currentPage, "SectionId": sectionId, "pagesize": $(this).val(), "search": $('#tableSearch').val() },
+                    success: function (response) {
+                        $('#SectionTablePV').html(response);
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                    }
+                });
+            });
+
+            $('#tableSearch').change(function () {
+        
+                    console.log("-------" + sectionId);
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: { "pageIndex": currentPage, "SectionId": sectionId, "pagesize": $(this).val(), "search": $('#tableSearch').val() },
+                    success: function (response) {
+                        $('#SectionTablePV').html(response);
+                    },
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                    }
+                });
+            });
+
+
+                function updateCheckAllState() {
+                    let totalPermissions = $(".table-checkbox").length;
+                    let checkedPermissions = $(".table-checkbox:checked").length;
+                    $("#selectAllTable").prop("checked", totalPermissions === checkedPermissions);
+                }
+            $(".table-checkbox").change(updateCheckAllState);
+
+            $('#selectAllTable').change(function () {
+                if ($(this).is(':checked')) {
+                    $(".table-checkbox").each(function () {
+                        if ($(this).is(':checked')) {
+
+                        } else {
+                            $(this).click();
+                        }
+                    });
+                } else {
+                    $(".table-checkbox").each(function () {
+                        if ($(this).is(':checked')) {
+                            $(this).click();
+                        }
+                    });
+                }
+            });
+
+            $("#MassDelete").click(function () {
+                let tableids = [];
+                $(".table-checkbox").each(function () {
+                    if ($(this).is(':checked')) {
+                        tableids.push($(this).val());
+                    }
+                });
+                console.log("ids==" + tableids);
+                let url = '/TableSection/DeleteMultipleTables';
+                console.log({ "tableids": tableids });
+                $.ajax({
+                    url: url,
+                    type: "DELETE",
+                    contentType: "application/json",
+                dataType:"json",
+                    data: { "tableids": tableids },
+                    success: function (response) {
+                            console.log(response)
+                        },
+                    error: function (request, status, error) {
+                        toastr.error(request.responseJSON.error)
+                        @* alert(request.responseText); *@
+                    }
+                });
+            });
+
+
+        });
+
+
+
+    </script>
