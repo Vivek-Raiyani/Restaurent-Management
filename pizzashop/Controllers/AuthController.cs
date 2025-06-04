@@ -40,7 +40,7 @@ public class AuthController : Controller
             var token = _jwtService.GenerateJwtToken(user_.Email, user_.RoleName ?? "");
             CookieUtils.SaveJWTToken(Response, token);
 
-            return RedirectToAction("UserMain", "Admin");
+            return RedirectToAction("Dashboard", "Admin");
         }
 
         CookieUtils.ClearCookies(HttpContext);
@@ -93,7 +93,7 @@ public class AuthController : Controller
                         return RedirectToAction("KotPage", "OrderApp");
                     }
                     TempData["success"] = "login success ";
-                    return RedirectToAction("UserMain", "Admin");
+                    return RedirectToAction("Dashboard", "Admin");
 
                 }
                 ModelState.AddModelError("Password", "Password is not correct");

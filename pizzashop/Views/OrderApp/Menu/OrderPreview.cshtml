@@ -62,7 +62,7 @@
                         }
 
                     </div>
-                    <div class="col-4 item-present-comment" data-id="@item.DetailsId">
+                    <div class="col-4 item-present-comment" data-id="@item.DetailsId" data-item="@item.ItemId">
                         <div class="w-100">@item.Name </div>
                         <div id="collapse-@(item.Name.Replace(" ",""))" class="mt-2 accordion-collapse collapse "
                             data-bs-parent="#accordionExample">
@@ -474,7 +474,8 @@
     $(document).on("click", ".deleteorderitem", function () {
         if ($(this).parent().parent().hasClass("new-item")) {
             console.log("item not save can be deleted deleted")
-            $(this).parent().parent().parent().remove();
+            $(this).parent().parent().remove();
+            calSubtotal()
             return;
         }
 

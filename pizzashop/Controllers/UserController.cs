@@ -58,14 +58,16 @@ public class UserController : Controller
             _userservice.AddUser(profile);
             // if user is not added the no email tosend
             // email sending connection
-            try{
+            try
+            {
                 _emailServices.NewUserMail(profile);
             }
-            catch (Exception ex){
+            catch (Exception ex)
+            {
                 TempData["error"] = ex.Message;
                 return RedirectToAction("UserMain", "Admin");
             }
-            
+
             TempData["success"] = "User Added Succesfully";
             return RedirectToAction("UserMain", "Admin");
         }
@@ -89,7 +91,7 @@ public class UserController : Controller
     {
         var user = _userservice.GetUser(email);
         user.Roles = _roleservice.GetAllRoles();
-        
+
         return View(user);
     }
 
@@ -130,13 +132,13 @@ public class UserController : Controller
         {
             _userservice.RemoveUser(email);
             // TempData["success"] = "User Deleted Succesfully";
-            return Ok(new { success = true, message = "User Deleted Succesfully"});
+            return Ok(new { success = true, message = "User Deleted Succesfully" });
         }
         catch (Exception e)
         {
             // TempData["error"] = "error " + e.Message + "Occured";
             // return RedirectToAction("Users", "Admin");
-            return Ok(new { error = true , message = "Error occured while Deleting"});
+            return Ok(new { error = true, message = "Error occured while Deleting" });
         }
     }
     #endregion
@@ -164,7 +166,7 @@ public class UserController : Controller
             }
 
             _userservice.EditUser(user);
-            
+
             TempData["success"] = "Profile Updated Succesfully";
             return View(user);
         }
@@ -178,13 +180,14 @@ public class UserController : Controller
 
     #region Change Password
     [HttpGet]
-     [CustomAuthorize(UserRoles.Admin, UserRoles.Manager, UserRoles.Chef)]
+    [CustomAuthorize(UserRoles.Admin, UserRoles.Manager, UserRoles.Chef)]
     public IActionResult ChangePassword()
     {
         return View();
     }
 
     [HttpPost]
+    [CustomAuthorize(UserRoles.Admin, UserRoles.Manager, UserRoles.Chef)]
     public IActionResult ChangePassword(PasswordChangeVM pass)
     {
 
@@ -192,11 +195,15 @@ public class UserController : Controller
         {
             var sessionUser = SessionUtils.GetUser(HttpContext);
             var result = _userservice.ChangePassword(sessionUser, pass.NewPassword, oldpass: pass.Password);
-
             if (result)
             {
+                if (User.IsInRole("Chef"))
+                {
+                    TempData["success"] = "Password Changed Succesfully";
+                    return RedirectToAction("KotPage", "OrderApp");
+                }
                 TempData["success"] = "Password Changed Succesfully";
-                return RedirectToAction("Users", "Admin");
+                return RedirectToAction("UserMain", "Admin");
             }
 
         }
@@ -209,17 +216,17 @@ public class UserController : Controller
     #region  Constrain check Endpoint
     // fileds -- username, email, phone
     public IActionResult CheckConstrians(string field, string value)
-    {   
-        if(string.IsNullOrEmpty(value))
+    {
+        if (string.IsNullOrEmpty(value))
         {
             return Ok();
         }
 
-        if( _userservice.CheckConstrians(field : field, value : value ) )
+        if (_userservice.CheckConstrians(field: field, value: value))
         {
             return Ok();
         }
-        return Ok( field +" is already taken");
+        return Ok(field + " is already taken");
     }
 
     #endregion

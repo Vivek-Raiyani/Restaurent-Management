@@ -527,10 +527,15 @@ public class MenuService : IMenuService
                 foreach (var group in groups)
                 {
                     group.IsDeleted = true;
-                    foreach(var mapping in group.ModifierGroupMappings){
+                    foreach (var mapping in group.ModifierGroupMappings)
+                    {
+                        mapping.Isdeleted = true;
+                    }
+                    foreach(var mapping in group.ItemModifierGroups){
                         mapping.Isdeleted= true;
                     }
-                };
+                }
+                ;
                 return _modifierGroupRepo.UpdateMany(groups) ? true : false;
                 
             default:

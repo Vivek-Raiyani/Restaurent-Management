@@ -44,8 +44,9 @@
         <div class="row m-0">
             <div class="col-lg-6">
                 <div class=" d-flex m-4">
-                    <input class="btn me-2 form-control " type="search" placeholder="Search" name="search"
-                        id="orderappmenusearch" style="border: 1px solid black;height :50px" aria-label="Search">
+                    <input class="btn me-2 text-start form-control w-50 " type="search" placeholder="Search"
+                        name="search" id="orderappmenusearch" style="border: 1px solid black;height :50px"
+                        aria-label="Search">
                     <label for="search" style="margin-left: -50px; margin-top: 10px;">
                         <i class="bi bi-search"></i>
                     </label>
@@ -56,8 +57,9 @@
                 <div class="d-flex align-center justify-content-end m-4 gap-3">
                     <div class="d-flex gap-3">
                         <div class="rounded border border-success" style="height: 25px; width: 25px;">
-                                <div class="rounded-circle bg-success" style="height: 15px; width: 15px; margin: 4px;"></div>
-                            </div> Veg
+                                <div class="rounded-circle bg-success" style="height: 15px; width: 15px; margin: 4px;">
+                            </div>
+                        </div> Veg
                     </div>
 
                     <div class="d-flex gap-3">
@@ -188,6 +190,7 @@
 
         $(document).on("click", "#order-item-add-btn", function () {
             let queryString = window.location.search;
+            let result = false;
             queryString = queryString.slice(0, 8); // Output: "?param1=value1&param2=value2"?orderid=71
             if (queryString != "?orderid") {
                 console.log("hello")
@@ -226,64 +229,104 @@
                 });
 
                 itemselected["modifiers"] = modifierselected;
+
+                // checking if item is present previously
+                $(".item-present-comment").each(function () {
+                    let DetailsId = $(this).data("id");
+                    let itemid = $(this).data("item");
+                    let itemmods = [];
+                    $(`.modifiers-${DetailsId}`).each(function () {
+                        itemmods.push($(this).data("id"));
+                    });
+
+                    if (itemselected.itemid == itemid) {
+                        if (modifierselected.length == itemmods.length) {
+                            result = true;
+                            modifierselected.forEach(function (modifier) {
+                                if (!itemmods.includes(modifier.modifierid)) {
+                                    result = false;
+                                }
+                            });
+                        }
+                    }
+                    console.log(result);
+                    if (result) {
+                        console.log("old item found")
+                        let quantity = parseInt($(`#quantity-${DetailsId}`).html());
+                        quantity++;
+                        console.log(quantity)
+                        $(`#quantity-${DetailsId}`).html(quantity);
+                        let rate = $(`#itemprice-${DetailsId}`).data("rate");
+                        $(`#itemprice-${DetailsId}`).html(rate*quantity);
+                        $(`#quantity-${DetailsId}`).html(quantity);
+                        result= true;
+                        return false;
+                    }
+                });
+                console.log(result)
+                if (result) {
+                    calSubtotal();
+                    toastr.success("item already present");
+                    return;
+                }
+
                 let modifiertotal = 0;
                 // adding to order bill parital view
 
                 let itemcard = `
                                                         <div class=" row m-0 new-item orderpreviewitem" data-itemid="${itemselected.itemid}" data-modifiercount="${modifercount}">
-                                                        <div class="col-1"> 
-                                                        <button class="accordion-button p-0" type="button" data-bs-toggle="collapse"
-                                                            data-bs-target="#collapse-${itemselected.name}-${modifercount}" aria-expanded="false" aria-controls="collapseOne${itemselected.name}">
-                                                        </button>
-                                                        </div>
-                                                        <div class="col-4">
-                                                        <div class="d-flex gap-3">
+                                                            <div class="col-1">
+                                                            </div>
+                                                            <div class="col-4">
+                                                            <div class="d-flex gap-3">
 
                                                             <div class=" w-100">${itemselected.name}</div>
 
                                                     </div>
-                                                    <div id="collapse-${itemselected.name}-${modifercount}" class="accordion-collapse collapse "
+                                                    <div id="collapse-${itemselected.name}-${modifercount}" class="accordion-collapse collapse show"
                                                                         data-bs-parent="#accordionExample">
                                                                         <div class="accordion-body p-0" >
                                                                             <ul class="p-0 m-0">`
                 modifierselected.forEach(function (modifier) {
                     itemcard += `
-                                                                        <li class="d-flex justify-content-between modifiers-0-${itemselected.itemid}-${modifercount}" data-id="${modifier.modifierid}"> 
-                                                                            <p class="m-0">${modifier.name}</p>
-                                                                            <p class="m-0">${modifier.price}</p>
-                                                                        </li>
-                                                                        `
+                                                                        <li class="d-flex gap-3 modifiers-0-${itemselected.itemid}-${modifercount}" data-id="${modifier.modifierid}"> 
+                                                                                <p><i class="bi bi-dot"></i><p> 
+                                                                                <div class="d-flex justify-content-between w-100">
+                                                                                    <p class="m-0 text-start">${modifier.name}</p>
+                                                                                    <p class="m-0">${modifier.price}</p>
+                                                                                </div>
+                                                                            </li>
+                                                                            `
                     modifiertotal += modifier.price
                 });
                 itemcard += `</ul>
+                                                                       </div>
                                                                         </div>
+                                                        </div>
+                                                        <div class="col-3">
+                                                            <div class="btn btn-outline-border-primary p-0">
+                                                                <div class="row m-0 p-2 ">
+                                                                    <div class="col-4 subtractbtn " data-id="0-${itemselected.itemid}-${modifercount}">
+                                                                        <button class="btn text-primary p-0"><strong>-</strong></button>
                                                                     </div>
-                                                    </div>
-                                                    <div class="col-3">
-                                                        <div class="btn btn-outline-border-primary p-0">
-                                                            <div class="row m-0 p-2 ">
-                                                                <div class="col-4 subtractbtn " data-id="0-${itemselected.itemid}-${modifercount}">
-                                                                    <button class="btn text-primary p-0"><strong>-</strong></button>
-                                                                </div>
-                                                                <div class="col-4 kotitemquantity text-center m-auto">
-                                                                    <span id="itemcount" hidden>${itemselected.quantity}</span>
-                                                                    <span id="quantity-0-${itemselected.itemid}-${modifercount}">${itemselected.quantity}</span>
-                                                                </div>
-                                                                <div class="col-4 addbtn" data-id="0-${itemselected.itemid}-${modifercount}">
-                                                                    <button class="btn text-primary p-0"><strong>+</strong></button>
+                                                                    <div class="col-4 kotitemquantity text-center m-auto">
+                                                                        <span id="itemcount" hidden>${itemselected.quantity}</span>
+                                                                        <span id="quantity-0-${itemselected.itemid}-${modifercount}">${itemselected.quantity}</span>
+                                                                    </div>
+                                                                    <div class="col-4 addbtn" data-id="0-${itemselected.itemid}-${modifercount}">
+                                                                        <button class="btn text-primary p-0"><strong>+</strong></button>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-2">
-                                                        <p class="m-0" id="itemprice-0-${itemselected.itemid}-${modifercount}" data-rate="${itemselected.price}">${itemselected.price}</p>
-                                                        <p class="m-0" id="modifierprice-0-${itemselected.itemid}-${modifercount}" data-rate="${modifiertotal}">${modifiertotal}</p>
-                                                    </div>
-                                                    <div class="col-2">
-                                                        <button class="btn btn-outline-border-primary text-primary deleteorderitem"><i class="bi bi-trash"></i></button>
-                                                    </div>
-                                                </div>
-                                                <hr>
+                                                   <div class="col-2">
+                                                            <p class="m-0" id="itemprice-0-${itemselected.itemid}-${modifercount}" data-rate="${itemselected.price}">${itemselected.price}</p>
+                                                            <p class="m-0" id="modifierprice-0-${itemselected.itemid}-${modifercount}" data-rate="${modifiertotal}">${modifiertotal}</p>
+                                                        </div>
+                                                        <div class="col-2">
+                                                            <button class="btn btn-outline-border-primary text-primary deleteorderitem"><i class="bi bi-trash"></i></button>
+                                                        </div>
+                                                        <hr>
+                                                        </div>
                                                 `;
 
                 toastr.success("item added")

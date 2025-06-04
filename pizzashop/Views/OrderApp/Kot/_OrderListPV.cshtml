@@ -1,7 +1,7 @@
 @model pizzashop.data.ViewModels.OrderApp.Kot.PaginatedKotVM<pizzashop.data.ViewModels.OrderApp.Kot.OrderCardVM>
 <div class="container tile mt-3">
     <div class="row gx-2 gy-2">
-        <h3 class="col-lg-6 ">Category Name</h3>
+        <h3 class="col-lg-6 text-primary" id="category-name">All</h3>
         <div class="col-lg-6 d-flex justify-content-end mb-3">
             <div class="nav nav-pills" id="nav-tab" role="tablist">
                 <button class="nav-link Kotstatus @(Model.Status == "pending" ? "active" : "")" id="KotProgressBtn" data-bs-toggle="tab" type="button">In
@@ -203,7 +203,7 @@
         });
 
         
-    
+        $("#category-name").html($(".KotCategory.active").html());
  
  
     });

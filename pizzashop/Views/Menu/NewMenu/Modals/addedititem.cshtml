@@ -241,7 +241,7 @@
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <p> Min </p>
-                            <select id="minimum${group.groupId}" class="minimum">`
+                            <select id="minimum${group.groupId}" class="minimum" data-id="${group.groupId}">`
                         let i =1;
                         group.modifiers.forEach(function(){
                             modifiercard += `<option value ="${i}" >${i}</option>`
@@ -254,6 +254,7 @@
                         i=1;
                         group.modifiers.forEach(function() {
                             modifiercard += `<option value ="${i}" >${i}</option>`
+                            i++;
                         });
 
                         modifiercard += ` </select>
@@ -354,6 +355,16 @@
         $(`.groupcheckbox${groupId}`).prop('checked', false);
         $(this).closest(".modifergroupdisplay").remove();
     });
+
+    $(document).on("change", ".minimum", function(){Add commentMore actions
+        let id = $(this).data("id");
+        let minval = $(`#minimum${id}`).val();
+        let maxval = $(`#maximum${id}`).val();
+        console.log(minval, maxval);
+        if(minval> maxval){
+            $(`#maximum${id}`).val(minval);
+        }
+    })
 
 
 </script>

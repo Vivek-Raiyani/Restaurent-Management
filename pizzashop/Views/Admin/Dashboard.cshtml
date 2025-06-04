@@ -95,14 +95,15 @@
                             let yValuesC = [0];
                             response.revenue.forEach(function (element) {
                                 var date = new Date(Date.parse(element.day));
-                                date = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + (date.getUTCDate())
+                                 date =(date.getMonth() + 1) + "/" + (date.getUTCDate())
                                 xValuesR.push(date);
                                 yValuesR.push(element.value)
                             })
 
                             response.customer.forEach(function (element) {
                                 var date = new Date(Date.parse(element.day));
-                                date = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + (date.getUTCDate())
+                                
+                                 date =(date.getMonth() + 1) + "/" + (date.getUTCDate())
                                 xValuesC.push(date);
                                 yValuesC.push(element.value)
                             })
@@ -167,7 +168,8 @@
                                 let maxC = 10;
                                 response.revenue.forEach(function (element) {
                                     var date = new Date(Date.parse(element.day));
-                                    date = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + (date.getUTCDate())
+                                   
+                                     date =(date.getMonth() + 1) + "/" + (date.getUTCDate())
                                     xValuesR.push(date);
                                     yValuesR.push(element.value)
                                     maxR = element.value > maxR ? element.value : maxR;
@@ -175,7 +177,8 @@
 
                                 response.customer.forEach(function (element) {
                                     var date = new Date(Date.parse(element.day));
-                                    date = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + (date.getUTCDate())
+                                
+                                     date =(date.getMonth() + 1) + "/" + (date.getUTCDate())
                                     xValuesC.push(date);
                                     yValuesC.push(element.value)
                                     maxC = element.value > maxC ? element.value : maxC;
