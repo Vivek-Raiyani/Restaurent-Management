@@ -8,11 +8,8 @@ A modern, modular restaurant management system built with **.NET Core 7**, desig
 
 - .NET Core 7
 - Entity Framework Core
-- SQL Server
-- RESTful APIs
+- Postgre
 - JWT Authentication
-- Swagger (API Testing)
-- Microsoft Identity
 - Bootstrap + HTML/CSS
 - JavaScript / jQuery
 
